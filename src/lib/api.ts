@@ -50,6 +50,20 @@ export async function updateLead(telefone: string, data: Partial<Lead>): Promise
 
 // ─── Metrics Computation ────────────────────────────────────────────────────
 
+function normalizeStatus(raw: string): string {
+  const map: Record<string, string> = {
+    'novo': 'EM_ATENDIMENTO', 'Novo': 'EM_ATENDIMENTO',
+    'aguardando': 'AGUARDANDO_SINAL', 'aguardando_sinal': 'AGUARDANDO_SINAL',
+    'comprovante_recebido': 'COMPROVANTE_RECEBIDO',
+    'fechou': 'FECHADO', 'Fechou': 'FECHADO', 'fechado': 'FECHADO',
+    'perdido': 'Perdido', 'PERDIDO': 'Perdido',
+    'Agendado': 'Agendado', 'agendado': 'Agendado',
+    'Atendimento_humano': 'Atendimento_humano', 'Parado': 'Parado',
+    'orcamento_enviado': 'ORCAMENTO_ENVIADO', 'Orcamento_enviado': 'ORCAMENTO_ENVIADO',
+  }
+  return map[raw] ?? raw
+}
+
 export function computeMetricsFromLeads(leads: Lead[]): Metrics {
   const today = new Date().toISOString().split('T')[0]
   const now = new Date()
@@ -61,9 +75,9 @@ export function computeMetricsFromLeads(leads: Lead[]): Metrics {
     l => l.Status_lead === 'FECHADO' && (l.data_cadastro?.startsWith(thisMonth) || l.Data?.startsWith(thisMonth))
   ).length
   const leadsEmAtendimento = leads.filter(l =>
-    ['EM_ATENDIMENTO', 'ORCAMENTO_ENVIADO', 'AGUARDANDO_SINAL', 'COMPROVANTE_RECEBIDO', 'Agendado', 'Atendimento_humano'].includes(l.Status_lead)
+    ['EM_ATENDIMENTO', 'ORCAMENTO_ENVIADO', 'AGUARDANDO_SINAL', 'COMPROVANTE_RECEBIDO', 'Agendado', 'Atendimento_humano'].includes(normalizeStatus(l.Status_lead))
   ).length
-  const totalFechados = leads.filter(l => l.Status_lead === 'FECHADO').length
+  const totalFechados = leads.filter(l => normalizeStatus(l.Status_lead) === 'FECHADO').length
   const taxaConversao = totalLeads > 0 ? Math.round((totalFechados / totalLeads) * 100) : 0
 
   // Leads por mês (últimos 6)
@@ -76,7 +90,8 @@ export function computeMetricsFromLeads(leads: Lead[]): Metrics {
   // Funil por status
   const statusCount: Record<string, number> = {}
   leads.forEach(l => {
-    statusCount[l.Status_lead] = (statusCount[l.Status_lead] || 0) + 1
+    const s = normalizeStatus(l.Status_lead)
+    statusCount[s] = (statusCount[s] || 0) + 1
   })
   const funilPorStatus: StatusData[] = Object.entries(statusCount)
     .map(([status, count]) => ({ status, count }))
@@ -95,7 +110,7 @@ export function computeMetricsFromLeads(leads: Lead[]): Metrics {
   const fechamentosVsLeads: MonthComparison[] = last6.map(month => ({
     mes: getMesLabel(month),
     leads: leads.filter(l => (l.data_cadastro || l.Data || '').startsWith(month)).length,
-    fechamentos: leads.filter(l => l.Status_lead === 'FECHADO' && (l.data_cadastro || l.Data || '').startsWith(month)).length,
+    fechamentos: leads.filter(l => normalizeStatus(l.Status_lead) === 'FECHADO' && (l.data_cadastro || l.Data || '').startsWith(month)).length,
   }))
 
   // Origem dos leads

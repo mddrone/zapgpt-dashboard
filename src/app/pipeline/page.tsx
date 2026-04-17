@@ -5,10 +5,43 @@ import { Calendar, Tag } from 'lucide-react'
 
 export const revalidate = 60
 
-const PIPELINE_COLUMNS: { status: StatusLead; label: string; color: string; border: string }[] = [
+// Normaliza os valores reais da planilha para os status do pipeline
+function normalizeStatus(raw: string): string {
+  const map: Record<string, string> = {
+    // Valores reais da planilha
+    'novo': 'EM_ATENDIMENTO',
+    'Novo': 'EM_ATENDIMENTO',
+    'em_atendimento': 'EM_ATENDIMENTO',
+    'EM_ATENDIMENTO': 'EM_ATENDIMENTO',
+    'orcamento_enviado': 'ORCAMENTO_ENVIADO',
+    'ORCAMENTO_ENVIADO': 'ORCAMENTO_ENVIADO',
+    'Orcamento_enviado': 'ORCAMENTO_ENVIADO',
+    'aguardando': 'AGUARDANDO_SINAL',
+    'AGUARDANDO_SINAL': 'AGUARDANDO_SINAL',
+    'aguardando_sinal': 'AGUARDANDO_SINAL',
+    'comprovante_recebido': 'AGUARDANDO_SINAL',
+    'COMPROVANTE_RECEBIDO': 'AGUARDANDO_SINAL',
+    'fechou': 'FECHADO',
+    'Fechou': 'FECHADO',
+    'FECHADO': 'FECHADO',
+    'fechado': 'FECHADO',
+    'perdido': 'Perdido',
+    'Perdido': 'Perdido',
+    'PERDIDO': 'Perdido',
+    'Agendado': 'EM_ATENDIMENTO',
+    'agendado': 'EM_ATENDIMENTO',
+    'Atendimento_humano': 'EM_ATENDIMENTO',
+    'atendimento_humano': 'EM_ATENDIMENTO',
+    'Parado': 'Perdido',
+    'parado': 'Perdido',
+  }
+  return map[raw] ?? raw
+}
+
+const PIPELINE_COLUMNS: { status: string; label: string; color: string; border: string }[] = [
   { status: 'EM_ATENDIMENTO', label: 'Em Atendimento', color: 'text-blue-400', border: 'border-blue-500/40' },
   { status: 'ORCAMENTO_ENVIADO', label: 'Orçamento Enviado', color: 'text-yellow-400', border: 'border-yellow-500/40' },
-  { status: 'AGUARDANDO_SINAL', label: 'Aguardando Sinal', color: 'text-green-400', border: 'border-green-500/40' },
+  { status: 'AGUARDANDO_SINAL', label: 'Aguardando Sinal', color: 'text-orange-400', border: 'border-orange-500/40' },
   { status: 'FECHADO', label: 'Fechado', color: 'text-green-400', border: 'border-green-500/40' },
   { status: 'Perdido', label: 'Perdido', color: 'text-red-400', border: 'border-red-500/40' },
 ]
@@ -90,7 +123,7 @@ export default async function PipelinePage() {
   const leads = await getLeads()
 
   const columnLeads = PIPELINE_COLUMNS.reduce((acc, col) => {
-    acc[col.status] = leads.filter(l => l.Status_lead === col.status)
+    acc[col.status] = leads.filter(l => normalizeStatus(l.Status_lead) === col.status)
     return acc
   }, {} as Record<string, Lead[]>)
 
