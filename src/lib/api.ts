@@ -37,11 +37,12 @@ export async function updateLead(telefone: string, data: Partial<Lead>): Promise
     return
   }
 
-  const res = await fetch(`${BASE}/webhook/dash-api`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ token: TOKEN, type: 'update', id: telefone, data }),
+  const params = new URLSearchParams({ token: TOKEN, type: 'update', id: telefone })
+  Object.entries(data).forEach(([k, v]) => {
+    if (v !== undefined && v !== null) params.set(k, String(v))
   })
+
+  const res = await fetch(`${BASE}/webhook/dash-api?${params.toString()}`)
 
   if (!res.ok) {
     throw new Error(`Failed to update lead: HTTP ${res.status}`)
