@@ -96,3 +96,32 @@ export interface CategoryClose {
   total: number
   taxa: number
 }
+
+// ── Financeiro ──────────────────────────────────────────────────────────────
+
+export interface Transacao {
+  id: number
+  data_transacao: string
+  tipo: 'entrada' | 'saida'
+  categoria: string
+  descricao: string
+  valor: number
+  forma_pagamento: string
+  referencia: string
+  observacoes: string
+  created_at: string
+}
+
+export interface FinanceiroMetrics {
+  saldo: number
+  totalEntradas: number
+  totalSaidas: number
+  totalTransacoes: number
+  entradasMes: number
+  saidasMes: number
+  saldoMes: number
+  gastosPorCategoria: { categoria: string; total: number; percentual: number }[]
+  fluxoMensal: { mes: string; entradas: number; saidas: number; saldo: number }[]
+  fluxoDiario: { data: string; entradas: number; saidas: number; saldo: number }[]
+  ultimasTransacoes: Transacao[]
+}

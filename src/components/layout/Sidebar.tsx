@@ -15,6 +15,7 @@ import {
   Zap,
   Menu,
   X,
+  Wallet,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -23,6 +24,7 @@ const navItems = [
   { href: '/leads', label: 'CRM / Leads', icon: Users },
   { href: '/pipeline', label: 'Pipeline', icon: Kanban },
   { href: '/metricas', label: 'Métricas', icon: BarChart3 },
+  { href: '/financeiro', label: 'Financeiro', icon: Wallet },
   { href: '/config', label: 'Configurações', icon: Settings },
 ]
 
