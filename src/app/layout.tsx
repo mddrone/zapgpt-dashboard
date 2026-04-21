@@ -4,10 +4,10 @@ import { Sidebar } from '@/components/layout/Sidebar'
 import { Header } from '@/components/layout/Header'
 
 export const metadata: Metadata = {
-  title: 'MD Drone — CRM Dashboard',
-  description: 'Painel de gerenciamento de leads e vendas para MD Drone',
+  title: 'ZapGpt AI — CRM Dashboard',
+  description: 'Painel de gerenciamento de leads e vendas para ZapGpt AI',
   icons: {
-    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📸</text></svg>",
+    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>",
   },
 }
 

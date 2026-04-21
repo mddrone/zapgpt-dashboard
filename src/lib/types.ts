@@ -1,32 +1,23 @@
 export interface Lead {
   Data: string
   Nome: string
-  Telefone: string
+  Celular: string
+  Email: string
   Origem: string
-  Tipo_evento: string
-  Categoria: string
-  Data_evento: string
-  Horário_evento: string
-  Cidade: string
-  Local_evento: string
-  Forma_atendimento: string
-  Status_evento: string
+  Segmento: string
+  Plano: string
   Status_lead: StatusLead
-  Ultima_interação: string
-  Proxima_ação: string
-  Melhor_dia_horário: string
+  Ultima_interacao: string
+  Proxima_acao: string
   Followup_data_hora: string
-  Agendamento_pendente: string
-  Agendamento_confirmado: string
-  Responsável: string
   Erro_fluxo: string
   Atendimento_concluido: string
-  Observações: string
+  Observacoes: string
   Followup_24h: string
   Followup_48h: string
   Followup_72h: string
-  Portfolio_enviado: string
-  Orcamento_enviado: string
+  Demo_enviada: string
+  Proposta_enviada: string
   Fechado: string
   Perdido: string
   Motivo_perda: string
@@ -35,22 +26,22 @@ export interface Lead {
 
 export type StatusLead =
   | 'EM_ATENDIMENTO'
-  | 'ORCAMENTO_ENVIADO'
-  | 'AGUARDANDO_SINAL'
-  | 'COMPROVANTE_RECEBIDO'
+  | 'DEMO_ENVIADA'
+  | 'PROPOSTA_ENVIADA'
+  | 'AGUARDANDO_PAGAMENTO'
   | 'FECHADO'
-  | 'Agendado'
   | 'Atendimento_humano'
   | 'Parado'
   | 'Perdido'
 
-export type Categoria =
-  | 'casamento'
-  | '15_anos'
-  | 'aniversario'
-  | 'ensaio'
-  | 'infantil'
-  | 'corporativo'
+export type Segmento =
+  | 'restaurante'
+  | 'clinica'
+  | 'salao'
+  | 'academia'
+  | 'ecommerce'
+  | 'imobiliaria'
+  | 'educacao'
   | 'outro'
 
 export interface Metrics {
@@ -61,11 +52,11 @@ export interface Metrics {
   leadsEmAtendimento: number
   leadsPorMes: MonthData[]
   funilPorStatus: StatusData[]
-  leadsPorCategoria: CategoryData[]
+  leadsPorSegmento: CategoryData[]
   fechamentosVsLeads: MonthComparison[]
   leadsPorOrigem: OrigemData[]
   leadsPorMesAproveitamento: AproveitamentoData[]
-  topCategoriasFechadas: CategoryClose[]
+  topSegmentosFechados: CategoryClose[]
 }
 
 export interface MonthData {
@@ -104,33 +95,4 @@ export interface CategoryClose {
   fechados: number
   total: number
   taxa: number
-}
-
-// ── Financeiro ──────────────────────────────────────────────────────────────
-
-export interface Transacao {
-  id: number
-  data_transacao: string
-  tipo: 'entrada' | 'saida'
-  categoria: string
-  descricao: string
-  valor: number
-  forma_pagamento: string
-  referencia: string
-  observacoes: string
-  created_at: string
-}
-
-export interface FinanceiroMetrics {
-  saldo: number
-  totalEntradas: number
-  totalSaidas: number
-  totalTransacoes: number
-  entradasMes: number
-  saidasMes: number
-  saldoMes: number
-  gastosPorCategoria: { categoria: string; total: number; percentual: number }[]
-  fluxoMensal: { mes: string; entradas: number; saidas: number; saldo: number }[]
-  fluxoDiario: { data: string; entradas: number; saidas: number; saldo: number }[]
-  ultimasTransacoes: Transacao[]
 }

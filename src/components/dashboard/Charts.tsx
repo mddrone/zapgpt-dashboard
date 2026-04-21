@@ -16,11 +16,11 @@ import {
   Legend,
 } from 'recharts'
 import type { Metrics } from '@/lib/types'
-import { getStatusConfig, getCategoriaConfig } from '@/lib/utils'
+import { getStatusConfig, getSegmentoConfig } from '@/lib/utils'
 
 const CHART_COLORS = [
-  '#22c55e', '#3b82f6', '#a855f7', '#eab308',
-  '#06b6d4', '#ec4899', '#f43f5e', '#10b981',
+  '#2563eb', '#a855f7', '#eab308', '#06b6d4',
+  '#ec4899', '#f43f5e', '#10b981', '#3b82f6',
 ]
 
 const tooltipStyle = {
@@ -61,10 +61,10 @@ export function LeadsPorMesChart({ data }: { data: Metrics['leadsPorMes'] }) {
           <Line
             type="monotone"
             dataKey="leads"
-            stroke="#22c55e"
+            stroke="#2563eb"
             strokeWidth={2}
-            dot={{ fill: '#22c55e', r: 4, strokeWidth: 0 }}
-            activeDot={{ r: 6, fill: '#22c55e' }}
+            dot={{ fill: '#2563eb', r: 4, strokeWidth: 0 }}
+            activeDot={{ r: 6, fill: '#2563eb' }}
             name="Leads"
           />
         </LineChart>
@@ -102,14 +102,14 @@ export function FunilConversaoChart({ data }: { data: Metrics['funilPorStatus'] 
   )
 }
 
-export function LeadsPorCategoriaChart({ data }: { data: Metrics['leadsPorCategoria'] }) {
+export function LeadsPorCategoriaChart({ data }: { data: { categoria: string; count: number }[] }) {
   const formattedData = data.map(d => ({
     ...d,
-    name: getCategoriaConfig(d.categoria).label,
+    name: getSegmentoConfig(d.categoria).label,
   }))
 
   return (
-    <ChartCard title="Leads por Categoria" subtitle="Distribuição de tipos de evento">
+    <ChartCard title="Leads por Segmento" subtitle="Distribuição por segmento de negócio">
       <ResponsiveContainer width="100%" height={220}>
         <PieChart>
           <Pie
@@ -148,7 +148,7 @@ export function FechamentosVsLeadsChart({ data }: { data: Metrics['fechamentosVs
           <YAxis tick={{ fill: '#a1a1aa', fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
           <Tooltip contentStyle={tooltipStyle} cursor={{ fill: '#18181b' }} />
           <Bar dataKey="leads" name="Leads" fill="#3b82f6" radius={[3, 3, 0, 0]} maxBarSize={24} />
-          <Bar dataKey="fechamentos" name="Fechamentos" fill="#22c55e" radius={[3, 3, 0, 0]} maxBarSize={24} />
+          <Bar dataKey="fechamentos" name="Fechamentos" fill="#2563eb" radius={[3, 3, 0, 0]} maxBarSize={24} />
           <Legend
             formatter={(value) => <span style={{ color: '#a1a1aa', fontSize: '11px' }}>{value}</span>}
             iconSize={8}

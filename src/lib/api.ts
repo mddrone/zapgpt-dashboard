@@ -5,23 +5,21 @@ import { getLast6Months, getMesLabel } from './utils'
 const BASE = process.env.NEXT_PUBLIC_N8N_BASE_URL || ''
 const TOKEN = process.env.NEXT_PUBLIC_DASHBOARD_TOKEN || ''
 
-// ─── API Functions ──────────────────────────────────────────────────────────
-
 export async function getLeads(): Promise<Lead[]> {
   if (!BASE) {
-    console.info('[MD Drone] N8N URL not set — using mock data')
+    console.info('[ZapGpt AI] N8N URL not set — using mock data')
     return MOCK_LEADS
   }
 
   try {
-    const res = await fetch(`${BASE}/webhook/dash-api?token=${TOKEN}&type=leads`, {
+    const res = await fetch(`${BASE}/webhook/zapgpt-dash-api?token=${TOKEN}&type=leads`, {
       cache: 'no-store',
     })
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
     const data = await res.json()
     return Array.isArray(data) ? data : (data.leads ?? MOCK_LEADS)
   } catch (err) {
-    console.warn('[MD Drone] Failed to fetch leads from n8n, using mock data:', err)
+    console.warn('[ZapGpt AI] Failed to fetch leads from n8n, using mock data:', err)
     return MOCK_LEADS
   }
 }
@@ -31,36 +29,33 @@ export async function getMetrics(): Promise<Metrics> {
   return computeMetricsFromLeads(leads)
 }
 
-export async function updateLead(telefone: string, data: Partial<Lead>): Promise<void> {
+export async function updateLead(celular: string, data: Partial<Lead>): Promise<void> {
   if (!BASE) {
-    console.info('[MD Drone] N8N URL not set — simulating update for', telefone)
+    console.info('[ZapGpt AI] N8N URL not set — simulating update for', celular)
     return
   }
 
-  const params = new URLSearchParams({ token: TOKEN, type: 'update', id: telefone })
+  const params = new URLSearchParams({ token: TOKEN, type: 'update', id: celular })
   Object.entries(data).forEach(([k, v]) => {
     if (v !== undefined && v !== null) params.set(k, String(v))
   })
 
-  const res = await fetch(`${BASE}/webhook/dash-api?${params.toString()}`)
+  const res = await fetch(`${BASE}/webhook/zapgpt-dash-api?${params.toString()}`)
 
   if (!res.ok) {
     throw new Error(`Failed to update lead: HTTP ${res.status}`)
   }
 }
 
-// ─── Metrics Computation ────────────────────────────────────────────────────
-
 function normalizeStatus(raw: string): string {
   const map: Record<string, string> = {
     'novo': 'EM_ATENDIMENTO', 'Novo': 'EM_ATENDIMENTO',
-    'aguardando': 'AGUARDANDO_SINAL', 'aguardando_sinal': 'AGUARDANDO_SINAL',
-    'comprovante_recebido': 'COMPROVANTE_RECEBIDO',
+    'aguardando': 'AGUARDANDO_PAGAMENTO', 'aguardando_pagamento': 'AGUARDANDO_PAGAMENTO',
+    'demo': 'DEMO_ENVIADA', 'demo_enviada': 'DEMO_ENVIADA',
+    'proposta': 'PROPOSTA_ENVIADA', 'proposta_enviada': 'PROPOSTA_ENVIADA',
     'fechou': 'FECHADO', 'Fechou': 'FECHADO', 'fechado': 'FECHADO',
     'perdido': 'Perdido', 'PERDIDO': 'Perdido',
-    'Agendado': 'Agendado', 'agendado': 'Agendado',
     'Atendimento_humano': 'Atendimento_humano', 'Parado': 'Parado',
-    'orcamento_enviado': 'ORCAMENTO_ENVIADO', 'Orcamento_enviado': 'ORCAMENTO_ENVIADO',
   }
   return map[raw] ?? raw
 }
@@ -76,19 +71,17 @@ export function computeMetricsFromLeads(leads: Lead[]): Metrics {
     l => l.Status_lead === 'FECHADO' && (l.data_cadastro?.startsWith(thisMonth) || l.Data?.startsWith(thisMonth))
   ).length
   const leadsEmAtendimento = leads.filter(l =>
-    ['EM_ATENDIMENTO', 'ORCAMENTO_ENVIADO', 'AGUARDANDO_SINAL', 'COMPROVANTE_RECEBIDO', 'Agendado', 'Atendimento_humano'].includes(normalizeStatus(l.Status_lead))
+    ['EM_ATENDIMENTO', 'DEMO_ENVIADA', 'PROPOSTA_ENVIADA', 'AGUARDANDO_PAGAMENTO', 'Atendimento_humano'].includes(normalizeStatus(l.Status_lead))
   ).length
   const totalFechados = leads.filter(l => normalizeStatus(l.Status_lead) === 'FECHADO').length
   const taxaConversao = totalLeads > 0 ? Math.round((totalFechados / totalLeads) * 100) : 0
 
-  // Leads por mês (últimos 6)
   const last6 = getLast6Months()
   const leadsPorMes: MonthData[] = last6.map(month => ({
     mes: getMesLabel(month),
     leads: leads.filter(l => (l.data_cadastro || l.Data || '').startsWith(month)).length,
   }))
 
-  // Funil por status
   const statusCount: Record<string, number> = {}
   leads.forEach(l => {
     const s = normalizeStatus(l.Status_lead)
@@ -98,23 +91,21 @@ export function computeMetricsFromLeads(leads: Lead[]): Metrics {
     .map(([status, count]) => ({ status, count }))
     .sort((a, b) => b.count - a.count)
 
-  // Leads por categoria
-  const catCount: Record<string, number> = {}
+  const segCount: Record<string, number> = {}
   leads.forEach(l => {
-    catCount[l.Categoria] = (catCount[l.Categoria] || 0) + 1
+    const seg = l.Segmento || 'outro'
+    segCount[seg] = (segCount[seg] || 0) + 1
   })
-  const leadsPorCategoria: CategoryData[] = Object.entries(catCount)
+  const leadsPorSegmento: CategoryData[] = Object.entries(segCount)
     .map(([categoria, count]) => ({ categoria, count }))
     .sort((a, b) => b.count - a.count)
 
-  // Fechamentos vs leads por mês
   const fechamentosVsLeads: MonthComparison[] = last6.map(month => ({
     mes: getMesLabel(month),
     leads: leads.filter(l => (l.data_cadastro || l.Data || '').startsWith(month)).length,
     fechamentos: leads.filter(l => normalizeStatus(l.Status_lead) === 'FECHADO' && (l.data_cadastro || l.Data || '').startsWith(month)).length,
   }))
 
-  // Origem dos leads
   const origemCount: Record<string, number> = {}
   leads.forEach(l => {
     const o = l.Origem || 'Desconhecido'
@@ -124,7 +115,6 @@ export function computeMetricsFromLeads(leads: Lead[]): Metrics {
     .map(([origem, count]) => ({ origem, count }))
     .sort((a, b) => b.count - a.count)
 
-  // Taxa de aproveitamento por mês
   const leadsPorMesAproveitamento: AproveitamentoData[] = last6.map(month => {
     const monthLeads = leads.filter(l => (l.data_cadastro || l.Data || '').startsWith(month))
     const monthFechados = monthLeads.filter(l => l.Status_lead === 'FECHADO').length
@@ -134,15 +124,14 @@ export function computeMetricsFromLeads(leads: Lead[]): Metrics {
     }
   })
 
-  // Top categorias fechadas
-  const catClose: Record<string, { fechados: number; total: number }> = {}
+  const segClose: Record<string, { fechados: number; total: number }> = {}
   leads.forEach(l => {
-    const c = l.Categoria || 'outro'
-    if (!catClose[c]) catClose[c] = { fechados: 0, total: 0 }
-    catClose[c].total++
-    if (l.Status_lead === 'FECHADO') catClose[c].fechados++
+    const c = l.Segmento || 'outro'
+    if (!segClose[c]) segClose[c] = { fechados: 0, total: 0 }
+    segClose[c].total++
+    if (l.Status_lead === 'FECHADO') segClose[c].fechados++
   })
-  const topCategoriasFechadas: CategoryClose[] = Object.entries(catClose)
+  const topSegmentosFechados: CategoryClose[] = Object.entries(segClose)
     .map(([categoria, { fechados, total }]) => ({
       categoria,
       fechados,
@@ -159,10 +148,10 @@ export function computeMetricsFromLeads(leads: Lead[]): Metrics {
     leadsEmAtendimento,
     leadsPorMes,
     funilPorStatus,
-    leadsPorCategoria,
+    leadsPorSegmento,
     fechamentosVsLeads,
     leadsPorOrigem,
     leadsPorMesAproveitamento,
-    topCategoriasFechadas,
+    topSegmentosFechados,
   }
 }

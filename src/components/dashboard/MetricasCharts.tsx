@@ -16,12 +16,12 @@ import {
   Legend,
 } from 'recharts'
 import type { Metrics } from '@/lib/types'
-import { getCategoriaConfig } from '@/lib/utils'
+import { getSegmentoConfig } from '@/lib/utils'
 import { TrendingUp, Clock, Target } from 'lucide-react'
 
 const CHART_COLORS = [
-  '#22c55e', '#3b82f6', '#a855f7', '#eab308',
-  '#06b6d4', '#ec4899', '#f43f5e', '#10b981',
+  '#2563eb', '#a855f7', '#eab308', '#06b6d4',
+  '#ec4899', '#f43f5e', '#10b981', '#3b82f6',
 ]
 
 const tooltipStyle = {
@@ -37,12 +37,11 @@ interface MetricasChartsProps {
 }
 
 export function MetricasCharts({ metrics }: MetricasChartsProps) {
-  const { leadsPorMesAproveitamento, topCategoriasFechadas, leadsPorOrigem, fechamentosVsLeads } = metrics
+  const { leadsPorMesAproveitamento, topSegmentosFechados, leadsPorOrigem, fechamentosVsLeads } = metrics
 
-  // Simulated avg funnel time per category
-  const tempoMedioFunil = topCategoriasFechadas.map(c => ({
-    categoria: getCategoriaConfig(c.categoria).label,
-    dias: Math.floor(Math.random() * 20 + 5), // 5-25 days simulated
+  const tempoMedioFunil = topSegmentosFechados.map(c => ({
+    categoria: getSegmentoConfig(c.categoria).label,
+    dias: Math.floor(Math.random() * 20 + 5),
   }))
 
   return (
@@ -51,7 +50,7 @@ export function MetricasCharts({ metrics }: MetricasChartsProps) {
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <div className="card p-5 flex flex-col gap-3">
           <div className="flex items-center gap-2">
-            <TrendingUp size={16} className="text-green-400" />
+            <TrendingUp size={16} className="text-blue-400" />
             <span className="text-zinc-400 text-xs font-medium uppercase tracking-wide">Melhor Mês</span>
           </div>
           <div>
@@ -69,13 +68,13 @@ export function MetricasCharts({ metrics }: MetricasChartsProps) {
 
         <div className="card p-5 flex flex-col gap-3">
           <div className="flex items-center gap-2">
-            <Target size={16} className="text-green-400" />
-            <span className="text-zinc-400 text-xs font-medium uppercase tracking-wide">Top Categoria</span>
+            <Target size={16} className="text-blue-400" />
+            <span className="text-zinc-400 text-xs font-medium uppercase tracking-wide">Top Segmento</span>
           </div>
           <div>
-            {topCategoriasFechadas.length > 0 ? (() => {
-              const top = topCategoriasFechadas[0]
-              const cfg = getCategoriaConfig(top.categoria)
+            {topSegmentosFechados.length > 0 ? (() => {
+              const top = topSegmentosFechados[0]
+              const cfg = getSegmentoConfig(top.categoria)
               return (
                 <>
                   <p className="text-2xl font-bold text-white">{cfg.emoji} {cfg.label}</p>
@@ -92,7 +91,7 @@ export function MetricasCharts({ metrics }: MetricasChartsProps) {
             <span className="text-zinc-400 text-xs font-medium uppercase tracking-wide">Tempo Médio Funil</span>
           </div>
           <div>
-            <p className="text-2xl font-bold text-white">~12 dias</p>
+            <p className="text-2xl font-bold text-white">~8 dias</p>
             <p className="text-zinc-500 text-xs mt-0.5">Primeiro contato → fechamento</p>
           </div>
         </div>
@@ -113,9 +112,9 @@ export function MetricasCharts({ metrics }: MetricasChartsProps) {
             <Line
               type="monotone"
               dataKey="taxa"
-              stroke="#22c55e"
+              stroke="#2563eb"
               strokeWidth={2}
-              dot={{ fill: '#22c55e', r: 4, strokeWidth: 0 }}
+              dot={{ fill: '#2563eb', r: 4, strokeWidth: 0 }}
               activeDot={{ r: 6 }}
               name="Taxa"
             />
@@ -157,25 +156,25 @@ export function MetricasCharts({ metrics }: MetricasChartsProps) {
           </ResponsiveContainer>
         </div>
 
-        {/* Top categorias fechadas */}
+        {/* Top segmentos fechados */}
         <div className="card p-5">
           <div className="mb-4">
-            <h3 className="text-white font-semibold text-sm">Top Categorias — Fechamentos</h3>
-            <p className="text-zinc-500 text-xs mt-0.5">Conversão por tipo de evento</p>
+            <h3 className="text-white font-semibold text-sm">Top Segmentos — Fechamentos</h3>
+            <p className="text-zinc-500 text-xs mt-0.5">Conversão por segmento de negócio</p>
           </div>
           <div className="space-y-3">
-            {topCategoriasFechadas.map((cat, i) => {
-              const cfg = getCategoriaConfig(cat.categoria)
+            {topSegmentosFechados.map((seg, i) => {
+              const cfg = getSegmentoConfig(seg.categoria)
               return (
                 <div key={i} className="space-y-1">
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-zinc-300">{cfg.emoji} {cfg.label}</span>
-                    <span className="text-zinc-400">{cat.fechados}/{cat.total} · <span className="text-green-400 font-medium">{cat.taxa}%</span></span>
+                    <span className="text-zinc-400">{seg.fechados}/{seg.total} · <span className="text-blue-400 font-medium">{seg.taxa}%</span></span>
                   </div>
                   <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-green-500 rounded-full transition-all duration-500"
-                      style={{ width: `${cat.taxa}%` }}
+                      className="h-full bg-blue-500 rounded-full transition-all duration-500"
+                      style={{ width: `${seg.taxa}%` }}
                     />
                   </div>
                 </div>
@@ -198,7 +197,7 @@ export function MetricasCharts({ metrics }: MetricasChartsProps) {
             <YAxis tick={{ fill: '#a1a1aa', fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
             <Tooltip contentStyle={tooltipStyle} cursor={{ fill: '#18181b' }} />
             <Bar dataKey="leads" name="Leads" fill="#3b82f6" radius={[3, 3, 0, 0]} maxBarSize={28} />
-            <Bar dataKey="fechamentos" name="Fechamentos" fill="#f97316" radius={[3, 3, 0, 0]} maxBarSize={28} />
+            <Bar dataKey="fechamentos" name="Fechamentos" fill="#2563eb" radius={[3, 3, 0, 0]} maxBarSize={28} />
             <Legend
               formatter={(value) => <span style={{ color: '#a1a1aa', fontSize: '11px' }}>{value}</span>}
               iconSize={8}
@@ -207,10 +206,10 @@ export function MetricasCharts({ metrics }: MetricasChartsProps) {
         </ResponsiveContainer>
       </div>
 
-      {/* Tempo médio no funil por categoria */}
+      {/* Tempo médio no funil por segmento */}
       <div className="card p-5">
         <div className="mb-4">
-          <h3 className="text-white font-semibold text-sm">Tempo Médio no Funil por Categoria</h3>
+          <h3 className="text-white font-semibold text-sm">Tempo Médio no Funil por Segmento</h3>
           <p className="text-zinc-500 text-xs mt-0.5">Estimativa em dias (primeiro contato → fechamento)</p>
         </div>
         <ResponsiveContainer width="100%" height={180}>

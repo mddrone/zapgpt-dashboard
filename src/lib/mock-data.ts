@@ -1,25 +1,33 @@
-import type { Lead, StatusLead, Categoria } from './types'
+import type { Lead, StatusLead, Segmento } from './types'
 
 const statuses: StatusLead[] = [
   'EM_ATENDIMENTO',
-  'ORCAMENTO_ENVIADO',
-  'AGUARDANDO_SINAL',
-  'COMPROVANTE_RECEBIDO',
+  'DEMO_ENVIADA',
+  'PROPOSTA_ENVIADA',
+  'AGUARDANDO_PAGAMENTO',
   'FECHADO',
-  'Agendado',
   'Atendimento_humano',
   'Parado',
   'Perdido',
 ]
 
-const categorias: Categoria[] = [
-  'casamento',
-  '15_anos',
-  'aniversario',
-  'ensaio',
-  'infantil',
-  'corporativo',
+const segmentos: Segmento[] = [
+  'restaurante',
+  'clinica',
+  'salao',
+  'academia',
+  'ecommerce',
+  'imobiliaria',
+  'educacao',
   'outro',
+]
+
+const planos = [
+  'Starter R$197/mês',
+  'Pro R$397/mês',
+  'Premium R$697/mês',
+  'Anual Pro',
+  'Anual Premium',
 ]
 
 const origens = [
@@ -29,20 +37,7 @@ const origens = [
   'Google',
   'Facebook',
   'Site',
-  'TikTok',
-]
-
-const cidades = [
-  'São Paulo',
-  'Rio de Janeiro',
-  'Curitiba',
-  'Belo Horizonte',
-  'Porto Alegre',
-  'Campinas',
-  'Florianópolis',
-  'Salvador',
-  'Brasília',
-  'Fortaleza',
+  'Prospecção',
 ]
 
 const nomes = [
@@ -83,38 +78,18 @@ const nomes = [
   'Quezia Fernandes',
 ]
 
-const locais = [
-  'Espaço Arjun',
-  'Buffet Vila Real',
-  'Chácara Bela Vista',
-  'Salão Nobre',
-  'Casa de Festas Aurora',
-  'Hotel Grand Hyatt',
-  'Espaço Giardino',
-  'Haras Santa Cruz',
-  'Club de Campo',
-  'Sítio das Flores',
-]
-
 function randomItem<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)]
 }
 
 function randomPhone(): string {
   const ddd = ['11', '21', '31', '41', '51', '61', '71', '85']
-  return `(${randomItem(ddd)}) 9${Math.floor(Math.random() * 9000 + 1000)}-${Math.floor(Math.random() * 9000 + 1000)}`
+  return `55${randomItem(ddd)}9${Math.floor(Math.random() * 9000 + 1000)}${Math.floor(Math.random() * 9000 + 1000)}`
 }
 
 function randomDate(start: Date, end: Date): string {
   const d = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()))
   return d.toISOString().split('T')[0]
-}
-
-function randomFutureDate(): string {
-  const start = new Date()
-  const end = new Date()
-  end.setMonth(end.getMonth() + 6)
-  return randomDate(start, end)
 }
 
 function randomPastDate(daysBack = 180): string {
@@ -130,62 +105,52 @@ export function generateMockLeads(): Lead[] {
 
   for (let i = 0; i < 35; i++) {
     const status = randomItem(statuses)
-    const categoria = randomItem(categorias)
+    const segmento = randomItem(segmentos)
     const isFechado = status === 'FECHADO'
     const isPerdido = status === 'Perdido'
-    const hasOrcamento = ['ORCAMENTO_ENVIADO', 'AGUARDANDO_SINAL', 'COMPROVANTE_RECEBIDO', 'FECHADO'].includes(status)
+    const hasDemo = ['DEMO_ENVIADA', 'PROPOSTA_ENVIADA', 'AGUARDANDO_PAGAMENTO', 'FECHADO'].includes(status)
 
-    // Some leads from today
     const isToday = i < 3
     const cadastro = isToday ? today : randomPastDate(150)
 
     leads.push({
       Data: cadastro,
       Nome: randomItem(nomes),
-      Telefone: randomPhone(),
+      Celular: randomPhone(),
+      Email: `lead${i}@exemplo.com`,
       Origem: randomItem(origens),
-      Tipo_evento: categoria === 'corporativo' ? 'Corporativo' : categoria === 'ensaio' ? 'Ensaio Fotográfico' : 'Evento Social',
-      Categoria: categoria,
-      Data_evento: randomFutureDate(),
-      Horário_evento: `${Math.floor(Math.random() * 8 + 10)}:00`,
-      Cidade: randomItem(cidades),
-      Local_evento: randomItem(locais),
-      Forma_atendimento: randomItem(['WhatsApp', 'Telefone', 'Instagram', 'Presencial']),
-      Status_evento: randomItem(['Confirmado', 'Pendente', 'A verificar']),
+      Segmento: segmento,
+      Plano: randomItem(planos),
       Status_lead: status,
-      Ultima_interação: randomPastDate(30),
-      Proxima_ação: randomItem([
-        'Enviar portfólio',
+      Ultima_interacao: randomPastDate(30),
+      Proxima_acao: randomItem([
+        'Enviar demo',
         'Ligar cliente',
-        'Enviar orçamento',
-        'Confirmar data',
+        'Enviar proposta',
+        'Confirmar pagamento',
         'Aguardar retorno',
         'Fechar contrato',
       ]),
-      Melhor_dia_horário: randomItem(['Segunda manhã', 'Terça tarde', 'Quarta', 'Quinta tarde', 'Sexta manhã']),
       Followup_data_hora: randomPastDate(20),
-      Agendamento_pendente: Math.random() > 0.7 ? 'Sim' : 'Não',
-      Agendamento_confirmado: Math.random() > 0.6 ? 'Sim' : 'Não',
-      Responsável: randomItem(['Bruno', 'Equipe MD', 'Atendimento']),
       Erro_fluxo: Math.random() > 0.9 ? 'Sim' : 'Não',
       Atendimento_concluido: isFechado || isPerdido ? 'Sim' : 'Não',
-      Observações: randomItem([
-        'Cliente solicitou pacote completo',
-        'Interesse em drone + foto',
-        'Aguardando confirmação do local',
+      Observacoes: randomItem([
+        'Cliente quer automatizar atendimento',
+        'Interesse no plano Premium',
+        'Aguardando aprovação do sócio',
         'Pediu desconto especial',
-        'Segunda consulta agendada',
+        'Segunda reunião agendada',
         '',
       ]),
       Followup_24h: Math.random() > 0.5 ? 'Enviado' : 'Pendente',
       Followup_48h: Math.random() > 0.5 ? 'Enviado' : 'Pendente',
       Followup_72h: Math.random() > 0.6 ? 'Enviado' : 'Pendente',
-      Portfolio_enviado: Math.random() > 0.4 ? 'Sim' : 'Não',
-      Orcamento_enviado: hasOrcamento ? 'Sim' : 'Não',
+      Demo_enviada: hasDemo ? 'Sim' : 'Não',
+      Proposta_enviada: ['PROPOSTA_ENVIADA', 'AGUARDANDO_PAGAMENTO', 'FECHADO'].includes(status) ? 'Sim' : 'Não',
       Fechado: isFechado ? 'Sim' : 'Não',
       Perdido: isPerdido ? 'Sim' : 'Não',
       Motivo_perda: isPerdido
-        ? randomItem(['Preço alto', 'Escolheu outro fotógrafo', 'Cancelou evento', 'Sem retorno', 'Orçamento fora do prazo'])
+        ? randomItem(['Preço alto', 'Escolheu concorrente', 'Sem budget agora', 'Sem retorno', 'Não viu valor'])
         : '',
       data_cadastro: cadastro,
     })

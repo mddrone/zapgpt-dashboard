@@ -17,10 +17,10 @@ const config: Config = {
         'text-primary': '#f4f4f5',
         'text-secondary': '#a1a1aa',
         accent: {
-          DEFAULT: '#22c55e',
-          hover: '#16a34a',
-          light: '#bbf7d0',
-          dark: '#15803d',
+          DEFAULT: '#2563eb',
+          hover: '#1d4ed8',
+          light: '#bfdbfe',
+          dark: '#1e40af',
         },
       },
       fontFamily: {

@@ -2,31 +2,31 @@
 
 import { useState, useMemo } from 'react'
 import { Search, Filter, ChevronRight, X } from 'lucide-react'
-import type { Lead, StatusLead, Categoria } from '@/lib/types'
-import { getStatusConfig, getCategoriaConfig, formatDate } from '@/lib/utils'
+import type { Lead } from '@/lib/types'
+import { getStatusConfig, getSegmentoConfig, formatDate } from '@/lib/utils'
 import { LeadModal } from './LeadModal'
 
 const STATUS_OPTIONS: { value: string; label: string }[] = [
   { value: '', label: 'Todos os status' },
   { value: 'EM_ATENDIMENTO', label: 'Em Atendimento' },
-  { value: 'ORCAMENTO_ENVIADO', label: 'Orçamento Enviado' },
-  { value: 'AGUARDANDO_SINAL', label: 'Aguardando Sinal' },
-  { value: 'COMPROVANTE_RECEBIDO', label: 'Comprovante Recebido' },
+  { value: 'DEMO_ENVIADA', label: 'Demo Enviada' },
+  { value: 'PROPOSTA_ENVIADA', label: 'Proposta Enviada' },
+  { value: 'AGUARDANDO_PAGAMENTO', label: 'Aguardando Pgto' },
   { value: 'FECHADO', label: 'Fechado' },
-  { value: 'Agendado', label: 'Agendado' },
   { value: 'Atendimento_humano', label: 'Atend. Humano' },
   { value: 'Parado', label: 'Parado' },
   { value: 'Perdido', label: 'Perdido' },
 ]
 
-const CATEGORIA_OPTIONS: { value: string; label: string }[] = [
-  { value: '', label: 'Todas as categorias' },
-  { value: 'casamento', label: 'Casamento' },
-  { value: '15_anos', label: '15 Anos' },
-  { value: 'aniversario', label: 'Aniversário' },
-  { value: 'ensaio', label: 'Ensaio' },
-  { value: 'infantil', label: 'Infantil' },
-  { value: 'corporativo', label: 'Corporativo' },
+const SEGMENTO_OPTIONS: { value: string; label: string }[] = [
+  { value: '', label: 'Todos os segmentos' },
+  { value: 'restaurante', label: 'Restaurante' },
+  { value: 'clinica', label: 'Clínica' },
+  { value: 'salao', label: 'Salão de Beleza' },
+  { value: 'academia', label: 'Academia' },
+  { value: 'ecommerce', label: 'E-commerce' },
+  { value: 'imobiliaria', label: 'Imobiliária' },
+  { value: 'educacao', label: 'Educação' },
   { value: 'outro', label: 'Outro' },
 ]
 
@@ -34,26 +34,26 @@ export function LeadsTable({ initialLeads }: { initialLeads: Lead[] }) {
   const [leads, setLeads] = useState(initialLeads)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
-  const [categoriaFilter, setCategoriaFilter] = useState('')
+  const [segmentoFilter, setSegmentoFilter] = useState('')
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null)
 
   const filtered = useMemo(() => {
     return leads.filter(lead => {
       const matchSearch = !search ||
         lead.Nome.toLowerCase().includes(search.toLowerCase()) ||
-        lead.Telefone.includes(search)
+        (lead.Celular || '').includes(search)
       const matchStatus = !statusFilter || lead.Status_lead === statusFilter
-      const matchCat = !categoriaFilter || lead.Categoria === categoriaFilter
-      return matchSearch && matchStatus && matchCat
+      const matchSeg = !segmentoFilter || lead.Segmento === segmentoFilter
+      return matchSearch && matchStatus && matchSeg
     })
-  }, [leads, search, statusFilter, categoriaFilter])
+  }, [leads, search, statusFilter, segmentoFilter])
 
   function handleLeadUpdate(updated: Lead) {
-    setLeads(prev => prev.map(l => l.Telefone === updated.Telefone ? updated : l))
+    setLeads(prev => prev.map(l => l.Celular === updated.Celular ? updated : l))
     setSelectedLead(updated)
   }
 
-  const hasFilters = search || statusFilter || categoriaFilter
+  const hasFilters = search || statusFilter || segmentoFilter
 
   return (
     <div className="flex flex-col gap-4">
@@ -63,7 +63,7 @@ export function LeadsTable({ initialLeads }: { initialLeads: Lead[] }) {
           <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
           <input
             type="text"
-            placeholder="Buscar por nome ou telefone..."
+            placeholder="Buscar por nome ou celular..."
             value={search}
             onChange={e => setSearch(e.target.value)}
             className="input-field pl-9"
@@ -85,18 +85,18 @@ export function LeadsTable({ initialLeads }: { initialLeads: Lead[] }) {
           </div>
 
           <select
-            value={categoriaFilter}
-            onChange={e => setCategoriaFilter(e.target.value)}
+            value={segmentoFilter}
+            onChange={e => setSegmentoFilter(e.target.value)}
             className="select-field"
           >
-            {CATEGORIA_OPTIONS.map(o => (
+            {SEGMENTO_OPTIONS.map(o => (
               <option key={o.value} value={o.value}>{o.label}</option>
             ))}
           </select>
 
           {hasFilters && (
             <button
-              onClick={() => { setSearch(''); setStatusFilter(''); setCategoriaFilter('') }}
+              onClick={() => { setSearch(''); setStatusFilter(''); setSegmentoFilter('') }}
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-sm transition-colors"
             >
               <X size={13} />
@@ -118,11 +118,11 @@ export function LeadsTable({ initialLeads }: { initialLeads: Lead[] }) {
             <thead>
               <tr className="border-b border-zinc-800/50 bg-zinc-900/50">
                 <th className="text-left px-4 py-3 text-zinc-500 font-semibold text-xs uppercase tracking-wide">Nome</th>
-                <th className="text-left px-4 py-3 text-zinc-500 font-semibold text-xs uppercase tracking-wide hidden md:table-cell">Telefone</th>
-                <th className="text-left px-4 py-3 text-zinc-500 font-semibold text-xs uppercase tracking-wide hidden lg:table-cell">Tipo Evento</th>
-                <th className="text-left px-4 py-3 text-zinc-500 font-semibold text-xs uppercase tracking-wide hidden sm:table-cell">Data Evento</th>
+                <th className="text-left px-4 py-3 text-zinc-500 font-semibold text-xs uppercase tracking-wide hidden md:table-cell">Celular</th>
+                <th className="text-left px-4 py-3 text-zinc-500 font-semibold text-xs uppercase tracking-wide hidden lg:table-cell">Plano</th>
+                <th className="text-left px-4 py-3 text-zinc-500 font-semibold text-xs uppercase tracking-wide hidden sm:table-cell">Cadastro</th>
                 <th className="text-left px-4 py-3 text-zinc-500 font-semibold text-xs uppercase tracking-wide">Status</th>
-                <th className="text-left px-4 py-3 text-zinc-500 font-semibold text-xs uppercase tracking-wide hidden md:table-cell">Categoria</th>
+                <th className="text-left px-4 py-3 text-zinc-500 font-semibold text-xs uppercase tracking-wide hidden md:table-cell">Segmento</th>
                 <th className="text-left px-4 py-3 text-zinc-500 font-semibold text-xs uppercase tracking-wide hidden xl:table-cell">Últ. Interação</th>
                 <th className="px-4 py-3 w-10"></th>
               </tr>
@@ -137,7 +137,7 @@ export function LeadsTable({ initialLeads }: { initialLeads: Lead[] }) {
               ) : (
                 filtered.map((lead, i) => {
                   const statusCfg = getStatusConfig(lead.Status_lead)
-                  const catCfg = getCategoriaConfig(lead.Categoria)
+                  const segCfg = getSegmentoConfig(lead.Segmento)
                   return (
                     <tr
                       key={i}
@@ -146,11 +146,11 @@ export function LeadsTable({ initialLeads }: { initialLeads: Lead[] }) {
                     >
                       <td className="px-4 py-3">
                         <p className="text-zinc-100 font-medium">{lead.Nome}</p>
-                        <p className="text-zinc-500 text-xs md:hidden">{lead.Telefone}</p>
+                        <p className="text-zinc-500 text-xs md:hidden">{lead.Celular}</p>
                       </td>
-                      <td className="px-4 py-3 hidden md:table-cell text-zinc-400 text-xs">{lead.Telefone}</td>
-                      <td className="px-4 py-3 hidden lg:table-cell text-zinc-400 text-xs">{lead.Tipo_evento || '—'}</td>
-                      <td className="px-4 py-3 hidden sm:table-cell text-zinc-400 text-xs">{formatDate(lead.Data_evento)}</td>
+                      <td className="px-4 py-3 hidden md:table-cell text-zinc-400 text-xs">{lead.Celular}</td>
+                      <td className="px-4 py-3 hidden lg:table-cell text-zinc-400 text-xs">{lead.Plano || '—'}</td>
+                      <td className="px-4 py-3 hidden sm:table-cell text-zinc-400 text-xs">{formatDate(lead.data_cadastro || lead.Data)}</td>
                       <td className="px-4 py-3">
                         <span className={`badge ${statusCfg.bg} ${statusCfg.color} whitespace-nowrap`}>
                           <span className={`w-1.5 h-1.5 rounded-full ${statusCfg.dot} flex-shrink-0`} />
@@ -159,11 +159,11 @@ export function LeadsTable({ initialLeads }: { initialLeads: Lead[] }) {
                       </td>
                       <td className="px-4 py-3 hidden md:table-cell">
                         <span className="text-zinc-400 text-xs">
-                          {catCfg.emoji} {catCfg.label}
+                          {segCfg.emoji} {segCfg.label}
                         </span>
                       </td>
                       <td className="px-4 py-3 hidden xl:table-cell text-zinc-400 text-xs">
-                        {formatDate(lead.Ultima_interação)}
+                        {formatDate(lead.Ultima_interacao)}
                       </td>
                       <td className="px-4 py-3">
                         <ChevronRight size={15} className="text-zinc-700" />
