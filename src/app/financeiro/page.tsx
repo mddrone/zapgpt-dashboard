@@ -124,7 +124,7 @@ function TransacaoModal({ onClose, onSave, editData }: {
             <div>
               <label className="text-xs text-zinc-400 mb-1 block">Valor (R$) *</label>
               <input
-                type="number" step="0.01" placeholder="0,00"
+                type="text" inputMode="decimal" placeholder="0,00"
                 value={form.valor}
                 onChange={e => setForm(f => ({ ...f, valor: e.target.value }))}
                 className="input-field w-full text-lg font-bold"

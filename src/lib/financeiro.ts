@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js'
+import { createBrowserClient } from '@supabase/ssr'
 import type { Transacao, FinanceiroMetrics } from './types'
 import { format, startOfMonth, endOfMonth, subMonths, parseISO, isValid } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
@@ -7,10 +7,7 @@ const FINANCEIRO_URL = process.env.NEXT_PUBLIC_SUPABASE_FINANCEIRO_URL!
 const FINANCEIRO_KEY = process.env.NEXT_PUBLIC_SUPABASE_FINANCEIRO_KEY!
 
 function createFinanceiroClient() {
-  return createClient(
-    FINANCEIRO_URL || 'https://placeholder.supabase.co',
-    FINANCEIRO_KEY || 'placeholder'
-  )
+  return createBrowserClient(FINANCEIRO_URL, FINANCEIRO_KEY)
 }
 
 export type PeriodoFiltro = 'hoje' | '7dias' | 'mes' | '3meses' | '6meses' | 'ano' | 'tudo'
