@@ -55,7 +55,7 @@
   }
 
   .btn-primary {
-    @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-green-500 hover:bg-green-600 text-white text-sm font-medium transition-colors shadow-md shadow-green-900/30;
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition-colors shadow-md shadow-blue-900/30 disabled:opacity-40 disabled:cursor-not-allowed;
   }
 
   .btn-secondary {
