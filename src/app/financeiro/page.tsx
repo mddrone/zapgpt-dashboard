@@ -226,9 +226,14 @@ export default function FinanceiroPage() {
 
   const load = useCallback(async () => {
     setLoading(true)
-    const data = await getTransacoes(periodo)
-    setTransacoes(data)
-    setLoading(false)
+    try {
+      const data = await getTransacoes(periodo)
+      setTransacoes(data)
+    } catch (e) {
+      console.error('Erro ao carregar transações:', e)
+    } finally {
+      setLoading(false)
+    }
   }, [periodo])
 
   useEffect(() => { load() }, [load])

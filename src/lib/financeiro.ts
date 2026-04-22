@@ -7,10 +7,10 @@ const FINANCEIRO_URL = process.env.NEXT_PUBLIC_SUPABASE_FINANCEIRO_URL!
 const FINANCEIRO_KEY = process.env.NEXT_PUBLIC_SUPABASE_FINANCEIRO_KEY!
 
 function createFinanceiroClient() {
-  if (!FINANCEIRO_URL || !FINANCEIRO_KEY) {
-    throw new Error(`Variáveis não definidas: URL=${FINANCEIRO_URL ?? 'undefined'} KEY=${FINANCEIRO_KEY ? 'ok' : 'undefined'}`)
-  }
-  return createClient(FINANCEIRO_URL, FINANCEIRO_KEY)
+  return createClient(
+    FINANCEIRO_URL || 'https://placeholder.supabase.co',
+    FINANCEIRO_KEY || 'placeholder'
+  )
 }
 
 export type PeriodoFiltro = 'hoje' | '7dias' | 'mes' | '3meses' | '6meses' | 'ano' | 'tudo'
