@@ -79,19 +79,15 @@ function TransacaoModal({ onClose, onSave, editData }: {
       } else {
         resultado = await criarTransacao(payload as any)
       }
-      if (!resultado) {
-        setErro('Erro ao salvar. Verifique o console do navegador.')
-        setSaving(false)
-        return
-      }
-    } catch (e: any) {
-      setErro(e?.message || 'Erro desconhecido')
       setSaving(false)
-      return
+      onSave()
+      onClose()
+    } catch (e: any) {
+      const url = process.env.NEXT_PUBLIC_SUPABASE_FINANCEIRO_URL
+      const keyOk = !!process.env.NEXT_PUBLIC_SUPABASE_FINANCEIRO_KEY
+      setErro(`${e?.message || 'Erro desconhecido'} | URL: ${url ? url.slice(0,30) : 'NÃO DEFINIDA'} | KEY: ${keyOk ? 'ok' : 'NÃO DEFINIDA'}`)
+      setSaving(false)
     }
-    setSaving(false)
-    onSave()
-    onClose()
   }
 
   return (
