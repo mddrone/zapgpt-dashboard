@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 
-const URL_KEY = process.env.NEXT_PUBLIC_SUPABASE_FINANCEIRO_URL || process.env.SUPABASE_FINANCEIRO_URL
-const API_KEY = process.env.NEXT_PUBLIC_SUPABASE_FINANCEIRO_KEY || process.env.SUPABASE_FINANCEIRO_KEY
+const URL_KEY = process.env.NEXT_PUBLIC_SUPABASE_FINANCEIRO_URL || process.env.SUPABASE_FINANCEIRO_URL || 'https://zrmlwhxsausektnahand.supabase.co'
+const API_KEY = process.env.NEXT_PUBLIC_SUPABASE_FINANCEIRO_KEY || process.env.SUPABASE_FINANCEIRO_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpybWx3aHhzYXVzZWt0bmFoYW5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4MDQ0OTMsImV4cCI6MjA5MjM4MDQ5M30.dCPz4AT6otOGbptzSZ5r6cO5ZTEAuDIp-KaIV4Yf-xw'
 
 function getSupabase() {
   if (!URL_KEY || !API_KEY) {
