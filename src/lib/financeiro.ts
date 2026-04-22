@@ -74,7 +74,7 @@ export async function getTransacoes(periodo: PeriodoFiltro = 'mes'): Promise<Tra
 export async function criarTransacao(t: Omit<Transacao, 'id' | 'created_at'>): Promise<Transacao | null> {
   const supabase = createFinanceiroClient()
   const { data, error } = await supabase.from('Gastos_ZapGpt').insert([t]).select().single()
-  if (error) { console.error(error); return null }
+  if (error) { throw new Error(`${error.message} (code: ${error.code})`) }
   return data as Transacao
 }
 
