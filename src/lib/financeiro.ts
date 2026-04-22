@@ -1,14 +1,6 @@
-import { createBrowserClient } from '@supabase/ssr'
 import type { Transacao, FinanceiroMetrics } from './types'
 import { format, startOfMonth, endOfMonth, subMonths, parseISO, isValid } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-
-const FINANCEIRO_URL = process.env.NEXT_PUBLIC_SUPABASE_FINANCEIRO_URL!
-const FINANCEIRO_KEY = process.env.NEXT_PUBLIC_SUPABASE_FINANCEIRO_KEY!
-
-function createFinanceiroClient() {
-  return createBrowserClient(FINANCEIRO_URL, FINANCEIRO_KEY)
-}
 
 export type PeriodoFiltro = 'hoje' | '7dias' | 'mes' | '3meses' | '6meses' | 'ano' | 'tudo'
 
@@ -46,18 +38,10 @@ function parseDataTransacao(raw: string): Date | null {
 }
 
 export async function getTransacoes(periodo: PeriodoFiltro = 'mes'): Promise<Transacao[]> {
-  const supabase = createFinanceiroClient()
-  const { data, error } = await supabase
-    .from('Gastos_ZapGpt')
-    .select('*')
-    .order('id', { ascending: false })
+  const res = await fetch('/api/financeiro', { cache: 'no-store' })
+  if (!res.ok) return []
+  const transacoes: Transacao[] = await res.json()
 
-  if (error) {
-    console.error('Supabase error:', error)
-    return []
-  }
-
-  const transacoes = (data || []) as Transacao[]
   if (periodo === 'tudo') return transacoes
 
   const { from, to } = getPeriodoRange(periodo)
@@ -71,23 +55,32 @@ export async function getTransacoes(periodo: PeriodoFiltro = 'mes'): Promise<Tra
 }
 
 export async function criarTransacao(t: Omit<Transacao, 'id' | 'created_at'>): Promise<Transacao | null> {
-  const supabase = createFinanceiroClient()
-  const { data, error } = await supabase.from('Gastos_ZapGpt').insert([t]).select().single()
-  if (error) { console.error(error); return null }
-  return data as Transacao
+  const res = await fetch('/api/financeiro', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(t),
+  })
+  if (!res.ok) { console.error(await res.text()); return null }
+  return res.json()
 }
 
 export async function deletarTransacao(id: number): Promise<boolean> {
-  const supabase = createFinanceiroClient()
-  const { error } = await supabase.from('Gastos_ZapGpt').delete().eq('id', id)
-  return !error
+  const res = await fetch('/api/financeiro', {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id }),
+  })
+  return res.ok
 }
 
 export async function atualizarTransacao(id: number, updates: Partial<Transacao>): Promise<Transacao | null> {
-  const supabase = createFinanceiroClient()
-  const { data, error } = await supabase.from('Gastos_ZapGpt').update(updates).eq('id', id).select().single()
-  if (error) { console.error(error); return null }
-  return data as Transacao
+  const res = await fetch('/api/financeiro', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id, ...updates }),
+  })
+  if (!res.ok) { console.error(await res.text()); return null }
+  return res.json()
 }
 
 export function calcularMetrics(transacoes: Transacao[]): FinanceiroMetrics {
