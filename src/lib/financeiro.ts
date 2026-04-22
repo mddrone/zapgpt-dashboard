@@ -7,6 +7,9 @@ const FINANCEIRO_URL = process.env.NEXT_PUBLIC_SUPABASE_FINANCEIRO_URL!
 const FINANCEIRO_KEY = process.env.NEXT_PUBLIC_SUPABASE_FINANCEIRO_KEY!
 
 function createFinanceiroClient() {
+  if (!FINANCEIRO_URL || !FINANCEIRO_KEY) {
+    throw new Error(`Variáveis não definidas: URL=${FINANCEIRO_URL ?? 'undefined'} KEY=${FINANCEIRO_KEY ? 'ok' : 'undefined'}`)
+  }
   return createClient(FINANCEIRO_URL, FINANCEIRO_KEY)
 }
 
