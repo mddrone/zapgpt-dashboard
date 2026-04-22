@@ -72,22 +72,18 @@ function TransacaoModal({ onClose, onSave, editData }: {
       ...form,
       valor: parseFloat(form.valor.replace(',', '.')),
     }
-    try {
-      let resultado
-      if (editData?.id) {
-        resultado = await atualizarTransacao(editData.id, payload)
-      } else {
-        resultado = await criarTransacao(payload as any)
-      }
+    const result = editData?.id
+      ? await atualizarTransacao(editData.id, payload)
+      : await criarTransacao(payload as any)
+
+    if (result.error) {
+      setErro(result.error)
       setSaving(false)
-      onSave()
-      onClose()
-    } catch (e: any) {
-      const url = process.env.NEXT_PUBLIC_SUPABASE_FINANCEIRO_URL
-      const keyOk = !!process.env.NEXT_PUBLIC_SUPABASE_FINANCEIRO_KEY
-      setErro(`${e?.message || 'Erro desconhecido'} | URL: ${url ? url.slice(0,30) : 'NÃO DEFINIDA'} | KEY: ${keyOk ? 'ok' : 'NÃO DEFINIDA'}`)
-      setSaving(false)
+      return
     }
+    setSaving(false)
+    onSave()
+    onClose()
   }
 
   return (
