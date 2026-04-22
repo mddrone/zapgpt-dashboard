@@ -62,18 +62,32 @@ function TransacaoModal({ onClose, onSave, editData }: {
     data_transacao: editData?.data_transacao || format(new Date(), 'dd/MM/yyyy'),
   })
   const [saving, setSaving] = useState(false)
+  const [erro, setErro] = useState('')
 
   async function handleSave() {
     if (!form.valor || !form.descricao) return
     setSaving(true)
+    setErro('')
     const payload = {
       ...form,
       valor: parseFloat(form.valor.replace(',', '.')),
     }
-    if (editData?.id) {
-      await atualizarTransacao(editData.id, payload)
-    } else {
-      await criarTransacao(payload as any)
+    try {
+      let resultado
+      if (editData?.id) {
+        resultado = await atualizarTransacao(editData.id, payload)
+      } else {
+        resultado = await criarTransacao(payload as any)
+      }
+      if (!resultado) {
+        setErro('Erro ao salvar. Verifique o console do navegador.')
+        setSaving(false)
+        return
+      }
+    } catch (e: any) {
+      setErro(e?.message || 'Erro desconhecido')
+      setSaving(false)
+      return
     }
     setSaving(false)
     onSave()
@@ -181,6 +195,11 @@ function TransacaoModal({ onClose, onSave, editData }: {
           </div>
         </div>
 
+        {erro && (
+          <div className="mx-5 mb-2 p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-xs">
+            {erro}
+          </div>
+        )}
         <div className="flex gap-3 p-5 border-t border-zinc-800">
           <button onClick={onClose} className="btn-secondary flex-1">Cancelar</button>
           <button
