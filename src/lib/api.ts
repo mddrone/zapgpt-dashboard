@@ -5,6 +5,24 @@ import { getLast6Months, getMesLabel } from './utils'
 const BASE = process.env.NEXT_PUBLIC_N8N_BASE_URL || ''
 const TOKEN = process.env.NEXT_PUBLIC_DASHBOARD_TOKEN || ''
 
+function normalizeLeadFields(raw: Record<string, string>): Lead {
+  return {
+    Data:                 raw.Data || '',
+    Nome:                 raw.Nome || '',
+    Celular:              raw.Telefone || raw.Celular || '',
+    Segmento:             raw.Tipo_segmento || raw.Segmento || '',
+    Plano:                raw.Categoria || raw.Plano || raw.Plano_interesse || '',
+    Status_lead:          (raw.Status_lead || 'EM_ATENDIMENTO') as Lead['Status_lead'],
+    Ultima_interacao:     raw.Ultima_interacao || raw['Ultima_interação'] || '',
+    Observacoes:          raw.Observacoes || raw['Observações'] || '',
+    Erro_fluxo:           raw.Erro_fluxo || '',
+    Atendimento_concluido: raw.Atendimento_concluido || '',
+    fechado:              raw.fechado || raw.Fechado || '',
+    perdido:              raw.perdido || raw.Perdido || '',
+    data_cadastro:        raw.data_cadastro || raw.Data || '',
+  }
+}
+
 export async function getLeads(): Promise<Lead[]> {
   if (!BASE) {
     console.info('[ZapGpt AI] N8N URL not set — using mock data')
@@ -17,7 +35,9 @@ export async function getLeads(): Promise<Lead[]> {
     })
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
     const data = await res.json()
-    return Array.isArray(data) ? data : (data.leads ?? MOCK_LEADS)
+    const rawLeads: Record<string, string>[] = Array.isArray(data) ? data : (data.leads ?? [])
+    if (!rawLeads.length) return MOCK_LEADS
+    return rawLeads.filter(r => r.Nome && r.Nome.trim()).map(normalizeLeadFields)
   } catch (err) {
     console.warn('[ZapGpt AI] Failed to fetch leads from n8n, using mock data:', err)
     return MOCK_LEADS
