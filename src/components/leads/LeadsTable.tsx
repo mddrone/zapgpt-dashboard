@@ -9,12 +9,10 @@ import { LeadModal } from './LeadModal'
 const STATUS_OPTIONS: { value: string; label: string }[] = [
   { value: '', label: 'Todos os status' },
   { value: 'EM_ATENDIMENTO', label: 'Em Atendimento' },
-  { value: 'DEMO_ENVIADA', label: 'Demo Enviada' },
   { value: 'PROPOSTA_ENVIADA', label: 'Proposta Enviada' },
-  { value: 'AGUARDANDO_PAGAMENTO', label: 'Aguardando Pgto' },
-  { value: 'FECHADO', label: 'Fechado' },
-  { value: 'Atendimento_humano', label: 'Atend. Humano' },
-  { value: 'Parado', label: 'Parado' },
+  { value: 'AGUARDANDO_SINAL', label: 'Aguardando Sinal' },
+  { value: 'COMPROVANTE_RECEBIDO', label: 'Comprovante Recebido' },
+  { value: 'FECHADO', label: '✅ Fechado' },
   { value: 'Perdido', label: 'Perdido' },
 ]
 

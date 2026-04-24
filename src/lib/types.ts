@@ -2,36 +2,24 @@ export interface Lead {
   Data: string
   Nome: string
   Celular: string
-  Email: string
-  Origem: string
   Segmento: string
   Plano: string
   Status_lead: StatusLead
   Ultima_interacao: string
-  Proxima_acao: string
-  Followup_data_hora: string
+  Observacoes: string
   Erro_fluxo: string
   Atendimento_concluido: string
-  Observacoes: string
-  Followup_24h: string
-  Followup_48h: string
-  Followup_72h: string
-  Demo_enviada: string
-  Proposta_enviada: string
-  Fechado: string
-  Perdido: string
-  Motivo_perda: string
+  fechado: string
+  perdido: string
   data_cadastro: string
 }
 
 export type StatusLead =
   | 'EM_ATENDIMENTO'
-  | 'DEMO_ENVIADA'
   | 'PROPOSTA_ENVIADA'
-  | 'AGUARDANDO_PAGAMENTO'
+  | 'AGUARDANDO_SINAL'
+  | 'COMPROVANTE_RECEBIDO'
   | 'FECHADO'
-  | 'Atendimento_humano'
-  | 'Parado'
   | 'Perdido'
 
 export type Segmento =

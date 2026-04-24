@@ -2,19 +2,17 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { X, Phone, Mail, Tag, MessageSquare, CheckCircle, XCircle } from 'lucide-react'
+import { X, Phone, Tag, MessageSquare, CheckCircle, XCircle } from 'lucide-react'
 import type { Lead, StatusLead } from '@/lib/types'
 import { getStatusConfig, getSegmentoConfig, formatDate } from '@/lib/utils'
 import { updateLead } from '@/lib/api'
 
 const ALL_STATUSES: StatusLead[] = [
   'EM_ATENDIMENTO',
-  'DEMO_ENVIADA',
   'PROPOSTA_ENVIADA',
-  'AGUARDANDO_PAGAMENTO',
+  'AGUARDANDO_SINAL',
+  'COMPROVANTE_RECEBIDO',
   'FECHADO',
-  'Atendimento_humano',
-  'Parado',
   'Perdido',
 ]
 
@@ -106,16 +104,11 @@ export function LeadModal({ lead, onClose, onUpdate }: LeadModalProps) {
         {/* Body */}
         <div className="flex-1 overflow-y-auto p-5 space-y-5">
           {/* Quick info */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             <div className="bg-zinc-900/60 rounded-lg p-3 border border-zinc-800/30">
               <Phone size={14} className="text-blue-400 mb-1.5" />
               <p className="text-zinc-500 text-[10px] uppercase tracking-wide">Celular</p>
               <p className="text-white text-xs font-medium mt-0.5">{lead.Celular}</p>
-            </div>
-            <div className="bg-zinc-900/60 rounded-lg p-3 border border-zinc-800/30">
-              <Mail size={14} className="text-blue-400 mb-1.5" />
-              <p className="text-zinc-500 text-[10px] uppercase tracking-wide">E-mail</p>
-              <p className="text-white text-xs font-medium mt-0.5">{lead.Email || '—'}</p>
             </div>
             <div className="bg-zinc-900/60 rounded-lg p-3 border border-zinc-800/30">
               <Tag size={14} className="text-blue-400 mb-1.5" />
@@ -124,8 +117,8 @@ export function LeadModal({ lead, onClose, onUpdate }: LeadModalProps) {
             </div>
             <div className="bg-zinc-900/60 rounded-lg p-3 border border-zinc-800/30">
               <Tag size={14} className="text-blue-400 mb-1.5" />
-              <p className="text-zinc-500 text-[10px] uppercase tracking-wide">Origem</p>
-              <p className="text-white text-xs font-medium mt-0.5">{lead.Origem || '—'}</p>
+              <p className="text-zinc-500 text-[10px] uppercase tracking-wide">Segmento</p>
+              <p className="text-white text-xs font-medium mt-0.5">{segCfg.emoji} {segCfg.label}</p>
             </div>
           </div>
 
@@ -198,43 +191,19 @@ export function LeadModal({ lead, onClose, onUpdate }: LeadModalProps) {
           {/* Fields grouped */}
           <div className="space-y-4">
             <div>
-              <h4 className="text-blue-400 text-[10px] font-bold uppercase tracking-widest mb-2">Contratação</h4>
+              <h4 className="text-blue-400 text-[10px] font-bold uppercase tracking-widest mb-2">Histórico</h4>
               <div className="bg-zinc-900/40 rounded-lg px-4 py-1 border border-zinc-800/30">
-                <FieldRow label="Segmento" value={lead.Segmento} />
-                <FieldRow label="Plano" value={lead.Plano} />
-                <FieldRow label="E-mail" value={lead.Email} />
-              </div>
-            </div>
-
-            <div>
-              <h4 className="text-blue-400 text-[10px] font-bold uppercase tracking-widest mb-2">Follow-up & Ações</h4>
-              <div className="bg-zinc-900/40 rounded-lg px-4 py-1 border border-zinc-800/30">
+                <FieldRow label="Data de Cadastro" value={formatDate(lead.data_cadastro || lead.Data)} />
                 <FieldRow label="Última Interação" value={formatDate(lead.Ultima_interacao)} />
-                <FieldRow label="Próxima Ação" value={lead.Proxima_acao} />
-                <FieldRow label="Follow-up Data/Hora" value={lead.Followup_data_hora} />
               </div>
             </div>
 
             <div>
-              <h4 className="text-blue-400 text-[10px] font-bold uppercase tracking-widest mb-2">Checklist</h4>
+              <h4 className="text-blue-400 text-[10px] font-bold uppercase tracking-widest mb-2">Situação</h4>
               <div className="bg-zinc-900/40 rounded-lg px-4 py-1 border border-zinc-800/30">
-                <BooleanField label="Atendimento Concluído" value={lead.Atendimento_concluido} />
-                <BooleanField label="Demo Enviada" value={lead.Demo_enviada} />
-                <BooleanField label="Proposta Enviada" value={lead.Proposta_enviada} />
-                <BooleanField label="Follow-up 24h" value={lead.Followup_24h} />
-                <BooleanField label="Follow-up 48h" value={lead.Followup_48h} />
-                <BooleanField label="Follow-up 72h" value={lead.Followup_72h} />
-                <BooleanField label="Fechado" value={lead.Fechado} />
-                <BooleanField label="Perdido" value={lead.Perdido} />
-                <BooleanField label="Erro no Fluxo" value={lead.Erro_fluxo} />
-              </div>
-            </div>
-
-            <div>
-              <h4 className="text-blue-400 text-[10px] font-bold uppercase tracking-widest mb-2">Resultado</h4>
-              <div className="bg-zinc-900/40 rounded-lg px-4 py-1 border border-zinc-800/30">
-                <FieldRow label="Motivo da Perda" value={lead.Motivo_perda} />
-                <FieldRow label="Data de Cadastro" value={formatDate(lead.data_cadastro)} />
+                <BooleanField label="Fechado" value={lead.fechado} />
+                <BooleanField label="Perdido" value={lead.perdido} />
+                {lead.Erro_fluxo && <FieldRow label="Erro no Fluxo" value={lead.Erro_fluxo} />}
               </div>
             </div>
           </div>

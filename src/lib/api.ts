@@ -50,12 +50,11 @@ export async function updateLead(celular: string, data: Partial<Lead>): Promise<
 function normalizeStatus(raw: string): string {
   const map: Record<string, string> = {
     'novo': 'EM_ATENDIMENTO', 'Novo': 'EM_ATENDIMENTO',
-    'aguardando': 'AGUARDANDO_PAGAMENTO', 'aguardando_pagamento': 'AGUARDANDO_PAGAMENTO',
-    'demo': 'DEMO_ENVIADA', 'demo_enviada': 'DEMO_ENVIADA',
     'proposta': 'PROPOSTA_ENVIADA', 'proposta_enviada': 'PROPOSTA_ENVIADA',
+    'aguardando': 'AGUARDANDO_SINAL', 'aguardando_sinal': 'AGUARDANDO_SINAL',
+    'comprovante_recebido': 'COMPROVANTE_RECEBIDO',
     'fechou': 'FECHADO', 'Fechou': 'FECHADO', 'fechado': 'FECHADO',
     'perdido': 'Perdido', 'PERDIDO': 'Perdido',
-    'Atendimento_humano': 'Atendimento_humano', 'Parado': 'Parado',
   }
   return map[raw] ?? raw
 }
@@ -71,7 +70,7 @@ export function computeMetricsFromLeads(leads: Lead[]): Metrics {
     l => l.Status_lead === 'FECHADO' && (l.data_cadastro?.startsWith(thisMonth) || l.Data?.startsWith(thisMonth))
   ).length
   const leadsEmAtendimento = leads.filter(l =>
-    ['EM_ATENDIMENTO', 'DEMO_ENVIADA', 'PROPOSTA_ENVIADA', 'AGUARDANDO_PAGAMENTO', 'Atendimento_humano'].includes(normalizeStatus(l.Status_lead))
+    ['EM_ATENDIMENTO', 'PROPOSTA_ENVIADA', 'AGUARDANDO_SINAL', 'COMPROVANTE_RECEBIDO'].includes(normalizeStatus(l.Status_lead))
   ).length
   const totalFechados = leads.filter(l => normalizeStatus(l.Status_lead) === 'FECHADO').length
   const taxaConversao = totalLeads > 0 ? Math.round((totalFechados / totalLeads) * 100) : 0
@@ -107,13 +106,7 @@ export function computeMetricsFromLeads(leads: Lead[]): Metrics {
   }))
 
   const origemCount: Record<string, number> = {}
-  leads.forEach(l => {
-    const o = l.Origem || 'Desconhecido'
-    origemCount[o] = (origemCount[o] || 0) + 1
-  })
-  const leadsPorOrigem: OrigemData[] = Object.entries(origemCount)
-    .map(([origem, count]) => ({ origem, count }))
-    .sort((a, b) => b.count - a.count)
+  const leadsPorOrigem: OrigemData[] = [{ origem: 'WhatsApp', count: leads.length }]
 
   const leadsPorMesAproveitamento: AproveitamentoData[] = last6.map(month => {
     const monthLeads = leads.filter(l => (l.data_cadastro || l.Data || '').startsWith(month))

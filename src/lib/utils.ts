@@ -47,41 +47,29 @@ export const STATUS_CONFIG: Record<string, { label: string; color: string; bg: s
     bg: 'bg-blue-900/40 border border-blue-700/50',
     dot: 'bg-blue-400',
   },
-  DEMO_ENVIADA: {
-    label: 'Demo Enviada',
-    color: 'text-yellow-300',
-    bg: 'bg-yellow-900/40 border border-yellow-700/50',
-    dot: 'bg-yellow-400',
-  },
   PROPOSTA_ENVIADA: {
     label: 'Proposta Enviada',
     color: 'text-orange-300',
     bg: 'bg-orange-900/40 border border-orange-700/50',
     dot: 'bg-orange-400',
   },
-  AGUARDANDO_PAGAMENTO: {
-    label: 'Aguardando Pgto',
+  AGUARDANDO_SINAL: {
+    label: 'Aguardando Sinal',
+    color: 'text-yellow-300',
+    bg: 'bg-yellow-900/40 border border-yellow-700/50',
+    dot: 'bg-yellow-400',
+  },
+  COMPROVANTE_RECEBIDO: {
+    label: 'Comprovante Recebido',
     color: 'text-purple-300',
     bg: 'bg-purple-900/40 border border-purple-700/50',
     dot: 'bg-purple-400',
   },
   FECHADO: {
-    label: 'Fechado',
-    color: 'text-blue-300',
-    bg: 'bg-blue-900/40 border border-blue-700/50',
-    dot: 'bg-blue-400',
-  },
-  Atendimento_humano: {
-    label: 'Atend. Humano',
-    color: 'text-indigo-300',
-    bg: 'bg-indigo-900/40 border border-indigo-700/50',
-    dot: 'bg-indigo-400',
-  },
-  Parado: {
-    label: 'Parado',
-    color: 'text-zinc-400',
-    bg: 'bg-zinc-800/60 border border-zinc-700/50',
-    dot: 'bg-zinc-500',
+    label: '✅ Fechado',
+    color: 'text-green-300',
+    bg: 'bg-green-900/40 border border-green-700/50',
+    dot: 'bg-green-400',
   },
   Perdido: {
     label: 'Perdido',
