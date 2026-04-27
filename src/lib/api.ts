@@ -37,7 +37,16 @@ export async function getLeads(): Promise<Lead[]> {
     const data = await res.json()
     const rawLeads: Record<string, string>[] = Array.isArray(data) ? data : (data.leads ?? [])
     if (!rawLeads.length) return MOCK_LEADS
-    return rawLeads.filter(r => r.Nome && r.Nome.trim()).map(normalizeLeadFields)
+    return rawLeads
+      .filter(r => {
+        const nome = r.Nome?.trim()
+        // Skip empty rows and header rows accidentally included in sheet data
+        if (!nome || nome === 'Nome') return false
+        // Skip MD Drone leads (event photography) that may share the same sheet
+        if (r.Tipo_evento && r.Tipo_evento.trim()) return false
+        return true
+      })
+      .map(normalizeLeadFields)
   } catch (err) {
     console.warn('[ZapGpt AI] Failed to fetch leads from n8n, using mock data:', err)
     return MOCK_LEADS
