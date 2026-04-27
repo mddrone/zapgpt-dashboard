@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Search, Plus, X, MapPin, Loader2, CheckCircle2, AlertCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { ExecucoesStatus } from './ExecucoesStatus'
 
 const SEGMENTOS_PADRAO = [
   { id: 'clinica medica',        label: 'Clínica Médica',        emoji: '🏥' },
@@ -47,6 +48,7 @@ export function ProspectarForm() {
   const [cidadeInput, setCidadeInput] = useState('')
   const [status, setStatus] = useState<Status>('idle')
   const [errorMsg, setErrorMsg] = useState('')
+  const [execRefreshKey, setExecRefreshKey] = useState(0)
 
   function toggleSegmento(id: string) {
     setSegmentos(prev =>
@@ -84,6 +86,7 @@ export function ProspectarForm() {
       })
       if (!res.ok) throw new Error((await res.json()).error || `HTTP ${res.status}`)
       setStatus('success')
+      setExecRefreshKey(k => k + 1)
     } catch (err) {
       setErrorMsg(String(err))
       setStatus('error')
@@ -140,11 +143,15 @@ export function ProspectarForm() {
           Nova Prospecção
         </button>
       </div>
+
+      <ExecucoesStatus refreshKey={execRefreshKey} />
     )
   }
 
   return (
     <div className="space-y-6">
+
+      <ExecucoesStatus refreshKey={execRefreshKey} />
 
       {/* Segments */}
       <div className="card p-5">
