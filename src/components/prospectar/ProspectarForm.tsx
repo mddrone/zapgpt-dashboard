@@ -100,51 +100,53 @@ export function ProspectarForm() {
 
   if (status === 'success') {
     return (
-      <div className="card p-8 flex flex-col items-center gap-4 text-center">
-        <div className="w-16 h-16 rounded-full bg-green-900/40 border border-green-700/50 flex items-center justify-center">
-          <CheckCircle2 size={32} className="text-green-400" />
-        </div>
-        <div>
-          <h3 className="text-xl font-bold text-zinc-100 mb-1">Prospecção Iniciada!</h3>
-          <p className="text-zinc-400 text-sm">
-            Buscando leads no Google Maps para <span className="text-zinc-200 font-medium">{segmentos.length} segmentos</span> em <span className="text-zinc-200 font-medium">{cidades.length} cidades</span>.
-          </p>
-          <p className="text-zinc-500 text-xs mt-2">Os leads aparecerão no CRM nas próximas horas.</p>
-        </div>
-
-        <div className="w-full max-w-md bg-zinc-900 rounded-xl p-4 text-left mt-2 space-y-2">
-          <p className="text-zinc-500 text-xs font-medium uppercase tracking-widest mb-3">Resumo</p>
+      <>
+        <div className="card p-8 flex flex-col items-center gap-4 text-center">
+          <div className="w-16 h-16 rounded-full bg-green-900/40 border border-green-700/50 flex items-center justify-center">
+            <CheckCircle2 size={32} className="text-green-400" />
+          </div>
           <div>
-            <p className="text-xs text-zinc-500 mb-1">Segmentos</p>
-            <div className="flex flex-wrap gap-1.5">
-              {segmentos.map(s => {
-                const cfg = SEGMENTOS_PADRAO.find(x => x.id === s)
-                return (
-                  <span key={s} className="text-xs px-2 py-0.5 rounded-full bg-blue-900/30 border border-blue-700/40 text-blue-300">
-                    {cfg ? `${cfg.emoji} ${cfg.label}` : s}
+            <h3 className="text-xl font-bold text-zinc-100 mb-1">Prospecção Iniciada!</h3>
+            <p className="text-zinc-400 text-sm">
+              Buscando leads no Google Maps para <span className="text-zinc-200 font-medium">{segmentos.length} segmentos</span> em <span className="text-zinc-200 font-medium">{cidades.length} cidades</span>.
+            </p>
+            <p className="text-zinc-500 text-xs mt-2">Os leads aparecerão no CRM nas próximas horas.</p>
+          </div>
+
+          <div className="w-full max-w-md bg-zinc-900 rounded-xl p-4 text-left mt-2 space-y-2">
+            <p className="text-zinc-500 text-xs font-medium uppercase tracking-widest mb-3">Resumo</p>
+            <div>
+              <p className="text-xs text-zinc-500 mb-1">Segmentos</p>
+              <div className="flex flex-wrap gap-1.5">
+                {segmentos.map(s => {
+                  const cfg = SEGMENTOS_PADRAO.find(x => x.id === s)
+                  return (
+                    <span key={s} className="text-xs px-2 py-0.5 rounded-full bg-blue-900/30 border border-blue-700/40 text-blue-300">
+                      {cfg ? `${cfg.emoji} ${cfg.label}` : s}
+                    </span>
+                  )
+                })}
+              </div>
+            </div>
+            <div>
+              <p className="text-xs text-zinc-500 mb-1 mt-3">Cidades</p>
+              <div className="flex flex-wrap gap-1.5">
+                {cidades.map(c => (
+                  <span key={c} className="text-xs px-2 py-0.5 rounded-full bg-purple-900/30 border border-purple-700/40 text-purple-300">
+                    <MapPin size={10} className="inline mr-1" />{c}
                   </span>
-                )
-              })}
+                ))}
+              </div>
             </div>
           </div>
-          <div>
-            <p className="text-xs text-zinc-500 mb-1 mt-3">Cidades</p>
-            <div className="flex flex-wrap gap-1.5">
-              {cidades.map(c => (
-                <span key={c} className="text-xs px-2 py-0.5 rounded-full bg-purple-900/30 border border-purple-700/40 text-purple-300">
-                  <MapPin size={10} className="inline mr-1" />{c}
-                </span>
-              ))}
-            </div>
-          </div>
+
+          <button onClick={resetForm} className="btn-secondary text-sm mt-2">
+            Nova Prospecção
+          </button>
         </div>
 
-        <button onClick={resetForm} className="btn-secondary text-sm mt-2">
-          Nova Prospecção
-        </button>
-      </div>
-
-      <ExecucoesStatus refreshKey={execRefreshKey} />
+        <ExecucoesStatus refreshKey={execRefreshKey} />
+      </>
     )
   }
 
