@@ -7,6 +7,7 @@ import {
   FechamentosVsLeadsChart,
 } from '@/components/dashboard/Charts'
 import { getStatusConfig } from '@/lib/utils'
+import { StatusOverview } from '@/components/dashboard/StatusOverview'
 import {
   Users,
   CalendarPlus,
@@ -65,6 +66,14 @@ export default async function DashboardPage() {
             subtitle="Ativos agora"
           />
         </div>
+      </section>
+
+      {/* Status Breakdown */}
+      <section>
+        <h2 className="text-zinc-400 text-xs font-semibold uppercase tracking-widest mb-4">
+          Status dos Leads
+        </h2>
+        <StatusOverview data={metrics.funilPorStatus} total={metrics.totalLeads} />
       </section>
 
       {/* Charts row 1 */}
