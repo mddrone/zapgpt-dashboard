@@ -143,23 +143,25 @@ export function LeadsRecentes({ refreshKey }: { refreshKey: number }) {
             </div>
           </div>
         ) : (
-          <ResponsiveContainer width="100%" height={112}>
-            <BarChart data={data?.graficoDiario ?? []} barSize={22} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
-              <XAxis dataKey="dia" tick={{ fill: '#71717a', fontSize: 10 }} axisLine={false} tickLine={false} />
-              <YAxis hide allowDecimals={false} />
-              <Tooltip
-                contentStyle={{ background: '#18181b', border: '1px solid #3f3f46', borderRadius: 8, fontSize: 12, padding: '6px 10px' }}
-                labelStyle={{ color: '#a1a1aa', marginBottom: 2 }}
-                itemStyle={{ color: '#60a5fa' }}
-                formatter={(v: number) => [`${v} lead${v !== 1 ? 's' : ''}`, '']}
-              />
-              <Bar dataKey="count" radius={[4, 4, 0, 0]}>
-                {(data?.graficoDiario ?? []).map((entry, idx) => (
-                  <Cell key={idx} fill={entry.count > 0 ? '#3b82f6' : '#27272a'} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+          <div style={{ width: '100%', height: 112 }}>
+            <ResponsiveContainer width="100%" height="100%" debounce={50}>
+              <BarChart data={data?.graficoDiario ?? []} barSize={22} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
+                <XAxis dataKey="dia" tick={{ fill: '#71717a', fontSize: 10 }} axisLine={false} tickLine={false} />
+                <YAxis hide allowDecimals={false} />
+                <Tooltip
+                  contentStyle={{ background: '#18181b', border: '1px solid #3f3f46', borderRadius: 8, fontSize: 12, padding: '6px 10px' }}
+                  labelStyle={{ color: '#a1a1aa', marginBottom: 2 }}
+                  itemStyle={{ color: '#60a5fa' }}
+                  formatter={(v: number) => v === 0 ? null : [`${v} lead${v !== 1 ? 's' : ''}`, '']}
+                />
+                <Bar dataKey="count" radius={[4, 4, 0, 0]} isAnimationActive={false}>
+                  {(data?.graficoDiario ?? []).map((entry, idx) => (
+                    <Cell key={idx} fill={entry.count > 0 ? '#3b82f6' : '#27272a'} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         )}
       </div>
 
