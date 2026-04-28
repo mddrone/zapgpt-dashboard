@@ -42,7 +42,7 @@ const DEFAULT_CIDADES = ['Niterói, RJ', 'São Gonçalo, RJ']
 
 type Status = 'idle' | 'loading' | 'success' | 'error'
 
-export function ProspectarForm() {
+export function ProspectarForm({ onSuccess }: { onSuccess?: () => void }) {
   const [segmentos, setSegmentos] = useState<string[]>(DEFAULT_SEGMENTOS)
   const [cidades, setCidades] = useState<string[]>(DEFAULT_CIDADES)
   const [cidadeInput, setCidadeInput] = useState('')
@@ -87,6 +87,7 @@ export function ProspectarForm() {
       if (!res.ok) throw new Error((await res.json()).error || `HTTP ${res.status}`)
       setStatus('success')
       setExecRefreshKey(k => k + 1)
+      onSuccess?.()
     } catch (err) {
       setErrorMsg(String(err))
       setStatus('error')
@@ -110,7 +111,7 @@ export function ProspectarForm() {
             <p className="text-zinc-400 text-sm">
               Buscando leads no Google Maps para <span className="text-zinc-200 font-medium">{segmentos.length} segmentos</span> em <span className="text-zinc-200 font-medium">{cidades.length} cidades</span>.
             </p>
-            <p className="text-zinc-500 text-xs mt-2">Os leads aparecerão no CRM nas próximas horas.</p>
+            <p className="text-zinc-500 text-xs mt-2">Os leads aparecerão abaixo (seção "Leads Encontrados") em alguns minutos.</p>
           </div>
 
           <div className="w-full max-w-md bg-zinc-900 rounded-xl p-4 text-left mt-2 space-y-2">

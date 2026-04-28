@@ -1,10 +1,13 @@
+'use client'
+
+import { useState } from 'react'
 import { Search } from 'lucide-react'
 import { ProspectarForm } from '@/components/prospectar/ProspectarForm'
 import { LeadsRecentes } from '@/components/prospectar/LeadsRecentes'
 
-export const metadata = { title: 'Prospectar Leads — ZapGpt AI' }
-
 export default function ProspectarPage() {
+  const [refreshKey, setRefreshKey] = useState(0)
+
   return (
     <div className="p-4 md:p-6 space-y-8">
       <div className="flex items-start gap-3">
@@ -19,10 +22,10 @@ export default function ProspectarPage() {
         </div>
       </div>
 
-      <ProspectarForm />
+      <ProspectarForm onSuccess={() => setRefreshKey(k => k + 1)} />
 
       <div>
-        <LeadsRecentes refreshKey={0} />
+        <LeadsRecentes refreshKey={refreshKey} />
       </div>
     </div>
   )
