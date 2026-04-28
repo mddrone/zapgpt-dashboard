@@ -5,14 +5,30 @@ import { getLast6Months, getMesLabel } from './utils'
 const BASE = process.env.NEXT_PUBLIC_N8N_BASE_URL || ''
 const TOKEN = process.env.NEXT_PUBLIC_DASHBOARD_TOKEN || ''
 
+const STATUS_MAP: Record<string, string> = {
+  'novo': 'EM_ATENDIMENTO', 'Novo': 'EM_ATENDIMENTO',
+  'em_atendimento': 'EM_ATENDIMENTO', 'EM_ATENDIMENTO': 'EM_ATENDIMENTO',
+  'Em atendimento': 'EM_ATENDIMENTO', 'em atendimento': 'EM_ATENDIMENTO',
+  'Atendimento_humano': 'EM_ATENDIMENTO',
+  'demo': 'PROPOSTA_ENVIADA', 'demo_enviada': 'PROPOSTA_ENVIADA', 'DEMO_ENVIADA': 'PROPOSTA_ENVIADA',
+  'proposta': 'PROPOSTA_ENVIADA', 'proposta_enviada': 'PROPOSTA_ENVIADA', 'PROPOSTA_ENVIADA': 'PROPOSTA_ENVIADA',
+  'aguardando_sinal': 'AGUARDANDO_SINAL', 'AGUARDANDO_SINAL': 'AGUARDANDO_SINAL',
+  'aguardando': 'AGUARDANDO_SINAL',
+  'comprovante_recebido': 'COMPROVANTE_RECEBIDO', 'COMPROVANTE_RECEBIDO': 'COMPROVANTE_RECEBIDO',
+  'fechou': 'FECHADO', 'Fechou': 'FECHADO', 'FECHADO': 'FECHADO', 'fechado': 'FECHADO',
+  'perdido': 'Perdido', 'Perdido': 'Perdido', 'PERDIDO': 'Perdido', 'Parado': 'Perdido',
+}
+
 function normalizeLeadFields(raw: Record<string, string>): Lead {
+  const rawStatus = raw.Status_lead || ''
+  const status = (STATUS_MAP[rawStatus] || rawStatus || 'EM_ATENDIMENTO') as Lead['Status_lead']
   return {
     Data:                 raw.Data || '',
     Nome:                 raw.Nome || '',
     Celular:              raw.Telefone || raw.Celular || '',
     Segmento:             raw.Tipo_segmento || raw.Segmento || '',
     Plano:                raw.Categoria || raw.Plano || raw.Plano_interesse || '',
-    Status_lead:          (raw.Status_lead || 'EM_ATENDIMENTO') as Lead['Status_lead'],
+    Status_lead:          status,
     Ultima_interacao:     raw.Ultima_interacao || raw['Ultima_interação'] || '',
     Observacoes:          raw.Observacoes || raw['Observações'] || '',
     Erro_fluxo:           raw.Erro_fluxo || '',

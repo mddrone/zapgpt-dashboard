@@ -9,8 +9,13 @@ export function cn(...inputs: ClassValue[]) {
 export function formatDate(dateStr: string): string {
   if (!dateStr) return '—'
   try {
-    const [year, month, day] = dateStr.split('-')
-    return `${day}/${month}/${year}`
+    // Brazilian format from Google Sheets: "21/04/2026, 07:23" or "21/04/2026"
+    if (/^\d{2}\/\d{2}\/\d{4}/.test(dateStr)) return dateStr.split(',')[0].trim()
+    // ISO format: "2026-04-21" or "2026-04-21T..."
+    const part = dateStr.split('T')[0]
+    const [year, month, day] = part.split('-')
+    if (year && month && day) return `${day}/${month}/${year}`
+    return dateStr
   } catch {
     return dateStr
   }

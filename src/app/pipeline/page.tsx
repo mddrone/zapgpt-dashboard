@@ -9,9 +9,11 @@ function normalizeStatus(raw: string): string {
   const map: Record<string, string> = {
     'novo': 'EM_ATENDIMENTO', 'Novo': 'EM_ATENDIMENTO',
     'em_atendimento': 'EM_ATENDIMENTO', 'EM_ATENDIMENTO': 'EM_ATENDIMENTO',
+    'Em atendimento': 'EM_ATENDIMENTO', 'em atendimento': 'EM_ATENDIMENTO',
     'demo': 'DEMO_ENVIADA', 'demo_enviada': 'DEMO_ENVIADA', 'DEMO_ENVIADA': 'DEMO_ENVIADA',
     'proposta': 'PROPOSTA_ENVIADA', 'proposta_enviada': 'PROPOSTA_ENVIADA', 'PROPOSTA_ENVIADA': 'PROPOSTA_ENVIADA',
     'aguardando_pagamento': 'AGUARDANDO_PAGAMENTO', 'AGUARDANDO_PAGAMENTO': 'AGUARDANDO_PAGAMENTO',
+    'aguardando_sinal': 'AGUARDANDO_PAGAMENTO', 'AGUARDANDO_SINAL': 'AGUARDANDO_PAGAMENTO',
     'fechou': 'FECHADO', 'Fechou': 'FECHADO', 'FECHADO': 'FECHADO', 'fechado': 'FECHADO',
     'perdido': 'Perdido', 'Perdido': 'Perdido', 'PERDIDO': 'Perdido',
     'Atendimento_humano': 'EM_ATENDIMENTO', 'Parado': 'Perdido',
