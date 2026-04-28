@@ -31,16 +31,14 @@ interface ApiData {
 
 const STATUS_STYLE: Record<string, string> = {
   novo:        'bg-zinc-800 text-zinc-400 border-zinc-700',
-  contactado:  'bg-blue-900/40 text-blue-300 border-blue-700/50',
+  qualificado: 'bg-blue-900/40 text-blue-300 border-blue-700/50',
   respondeu:   'bg-green-900/40 text-green-300 border-green-700/50',
-  sem_whatsapp:'bg-red-900/40 text-red-400 border-red-700/50',
 }
 
 const STATUS_LABEL: Record<string, string> = {
-  novo:        'Não contatado',
-  contactado:  'Mensagem enviada',
+  novo:        'Sem WhatsApp',
+  qualificado: 'Mensagem enviada',
   respondeu:   'Respondeu',
-  sem_whatsapp:'Sem WhatsApp',
 }
 
 function formatDate(iso: string) {

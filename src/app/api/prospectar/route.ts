@@ -10,13 +10,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Segmentos e cidades são obrigatórios' }, { status: 400 })
     }
 
-    const res = await fetch(`${N8N_BASE}/webhook/leadflow-prospectar`, {
+    // Fire-and-forget: dispara o n8n sem aguardar (prospecção roda em background)
+    fetch(`${N8N_BASE}/webhook/leadflow-prospectar`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ segmentos, cidades }),
-    })
-
-    if (!res.ok) throw new Error(`n8n respondeu ${res.status}`)
+    }).catch(() => {})
 
     return NextResponse.json({ ok: true, segmentos, cidades })
   } catch (err) {
