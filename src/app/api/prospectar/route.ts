@@ -4,17 +4,19 @@ const N8N_BASE = process.env.NEXT_PUBLIC_N8N_BASE_URL || ''
 
 export async function POST(req: NextRequest) {
   try {
-    const { segmentos, cidades } = await req.json()
+    const { segmentos, cidades, limite_leads } = await req.json()
 
     if (!segmentos?.length || !cidades?.length) {
       return NextResponse.json({ error: 'Segmentos e cidades são obrigatórios' }, { status: 400 })
     }
 
+    const limiteSeguro = Math.max(1, Math.min(200, Number(limite_leads) || 20))
+
     // Fire-and-forget: dispara o n8n sem aguardar (prospecção roda em background)
     fetch(`${N8N_BASE}/webhook/leadflow-prospectar`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ segmentos, cidades }),
+      body: JSON.stringify({ segmentos, cidades, limite_leads: limiteSeguro }),
     }).catch(() => {})
 
     return NextResponse.json({ ok: true, segmentos, cidades })

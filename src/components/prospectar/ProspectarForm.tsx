@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Search, Plus, X, MapPin, Loader2, CheckCircle2, AlertCircle } from 'lucide-react'
+import { Search, Plus, X, MapPin, Loader2, CheckCircle2, AlertCircle, ShieldAlert } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ExecucoesStatus } from './ExecucoesStatus'
 
@@ -46,6 +46,7 @@ export function ProspectarForm({ onSuccess }: { onSuccess?: () => void }) {
   const [segmentos, setSegmentos] = useState<string[]>(DEFAULT_SEGMENTOS)
   const [cidades, setCidades] = useState<string[]>(DEFAULT_CIDADES)
   const [cidadeInput, setCidadeInput] = useState('')
+  const [limiteLeads, setLimiteLeads] = useState(20)
   const [status, setStatus] = useState<Status>('idle')
   const [errorMsg, setErrorMsg] = useState('')
   const [execRefreshKey, setExecRefreshKey] = useState(0)
@@ -82,7 +83,7 @@ export function ProspectarForm({ onSuccess }: { onSuccess?: () => void }) {
       const res = await fetch('/api/prospectar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ segmentos, cidades }),
+        body: JSON.stringify({ segmentos, cidades, limite_leads: limiteLeads }),
       })
       if (!res.ok) throw new Error((await res.json()).error || `HTTP ${res.status}`)
       setStatus('success')
@@ -111,7 +112,10 @@ export function ProspectarForm({ onSuccess }: { onSuccess?: () => void }) {
             <p className="text-zinc-400 text-sm">
               Buscando leads no Google Maps para <span className="text-zinc-200 font-medium">{segmentos.length} segmentos</span> em <span className="text-zinc-200 font-medium">{cidades.length} cidades</span>.
             </p>
-            <p className="text-zinc-500 text-xs mt-2">Os leads aparecerão abaixo (seção "Leads Encontrados") em alguns minutos.</p>
+            <p className="text-zinc-500 text-xs mt-1">
+              Limite de <span className="text-amber-300 font-medium">{limiteLeads} leads</span> por disparo.
+            </p>
+            <p className="text-zinc-500 text-xs mt-1">Os leads aparecerão abaixo (seção "Leads Encontrados") em alguns minutos.</p>
           </div>
 
           <div className="w-full max-w-md bg-zinc-900 rounded-xl p-4 text-left mt-2 space-y-2">
@@ -267,6 +271,36 @@ export function ProspectarForm({ onSuccess }: { onSuccess?: () => void }) {
         )}
       </div>
 
+      {/* Limite de leads */}
+      <div className="card p-5">
+        <div className="flex items-start gap-3">
+          <ShieldAlert size={16} className="text-amber-400 flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <div className="flex items-center justify-between mb-1">
+              <h3 className="text-zinc-100 font-semibold text-sm">Limite de leads por disparo</h3>
+              <span className="text-amber-300 font-bold text-sm tabular-nums">{limiteLeads}</span>
+            </div>
+            <p className="text-zinc-500 text-xs mb-3">
+              Controla quantos leads recebem mensagem por execução. Valores baixos evitam bloqueio pelo WhatsApp.
+            </p>
+            <input
+              type="range"
+              min={5}
+              max={100}
+              step={5}
+              value={limiteLeads}
+              onChange={e => setLimiteLeads(Number(e.target.value))}
+              className="w-full accent-amber-400"
+            />
+            <div className="flex justify-between text-xs text-zinc-600 mt-1">
+              <span>5 (seguro)</span>
+              <span>25 (moderado)</span>
+              <span>100 (risco)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Summary + Submit */}
       <div className="card p-5">
         <div className="flex items-center justify-between gap-4 flex-wrap">
@@ -278,6 +312,7 @@ export function ProspectarForm({ onSuccess }: { onSuccess?: () => void }) {
                 Vai buscar <span className="text-zinc-200 font-semibold">{segmentos.length} segmentos</span> em{' '}
                 <span className="text-zinc-200 font-semibold">{cidades.length} cidades</span>{' '}
                 <span className="text-zinc-600">({segmentos.length * cidades.length} buscas)</span>
+                {' '}· limite <span className="text-amber-300 font-semibold">{limiteLeads}</span> leads
               </>
             )}
           </div>
