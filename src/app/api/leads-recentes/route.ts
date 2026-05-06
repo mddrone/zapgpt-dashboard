@@ -3,8 +3,8 @@ import { NextResponse } from 'next/server'
 export const revalidate = 0
 
 const SB_URL = process.env.NEXT_PUBLIC_SUPABASE_FINANCEIRO_URL || 'https://zrmlwhxsausektnahand.supabase.co'
+// NEVER use the anon key here — leads_prospeccao has RLS; only service role bypasses it
 const SB_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
-  || process.env.NEXT_PUBLIC_SUPABASE_FINANCEIRO_KEY
   || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpybWx3aHhzYXVzZWt0bmFoYW5kIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjgwNDQ5MywiZXhwIjoyMDkyMzgwNDkzfQ.UgsCsPIoxJ6x5OT_MVIXxp8ywCStVMBO2cMYZjXCE3c'
 
 interface SupabaseLead {
