@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
-import { Users, RefreshCw, TrendingUp, Calendar, Clock, AlertCircle, MapPin, Star, Phone, Globe } from 'lucide-react'
+import { Users, RefreshCw, TrendingUp, Calendar, Clock, AlertCircle, MapPin, Star, Phone, Globe, MessageCircle, PlayCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface LeadRow {
@@ -25,20 +25,22 @@ interface GraficoItem { dia: string; date: string; count: number }
 interface ApiData {
   leads: LeadRow[]
   graficoDiario: GraficoItem[]
-  kpis: { hoje: number; ontem: number; semana: number; mes: number }
+  kpis: { hoje: number; ontem: number; semana: number; mes: number; em_atendimento: number; demo_solicitada: number }
   total: number
 }
 
 const STATUS_STYLE: Record<string, string> = {
-  novo:        'bg-zinc-800 text-zinc-400 border-zinc-700',
-  qualificado: 'bg-blue-900/40 text-blue-300 border-blue-700/50',
-  respondeu:   'bg-green-900/40 text-green-300 border-green-700/50',
+  novo:             'bg-zinc-800 text-zinc-400 border-zinc-700',
+  qualificado:      'bg-blue-900/40 text-blue-300 border-blue-700/50',
+  respondeu:        'bg-green-900/40 text-green-300 border-green-700/50',
+  demo_solicitada:  'bg-purple-900/40 text-purple-300 border-purple-700/50',
 }
 
 const STATUS_LABEL: Record<string, string> = {
-  novo:        'Sem WhatsApp',
-  qualificado: 'Mensagem enviada',
-  respondeu:   'Respondeu',
+  novo:             'Sem WhatsApp',
+  qualificado:      'Mensagem enviada',
+  respondeu:        'Em atendimento',
+  demo_solicitada:  'Pediu demo',
 }
 
 function formatDate(iso: string) {
@@ -84,10 +86,12 @@ export function LeadsRecentes({ refreshKey }: { refreshKey: number }) {
   useEffect(() => { load() }, [load, refreshKey])
 
   const kpis = [
-    { label: 'Hoje',    value: data?.kpis.hoje   ?? 0, icon: Clock,      color: 'text-blue-400'   },
-    { label: 'Ontem',   value: data?.kpis.ontem  ?? 0, icon: Calendar,   color: 'text-zinc-400'   },
-    { label: '7 dias',  value: data?.kpis.semana ?? 0, icon: TrendingUp,  color: 'text-green-400'  },
-    { label: 'Total',   value: data?.total       ?? 0, icon: Users,       color: 'text-purple-400' },
+    { label: 'Hoje',           value: data?.kpis.hoje            ?? 0, icon: Clock,          color: 'text-blue-400'    },
+    { label: 'Ontem',          value: data?.kpis.ontem           ?? 0, icon: Calendar,       color: 'text-zinc-400'    },
+    { label: '7 dias',         value: data?.kpis.semana          ?? 0, icon: TrendingUp,     color: 'text-green-400'   },
+    { label: 'Total',          value: data?.total                ?? 0, icon: Users,          color: 'text-purple-400'  },
+    { label: 'Em atendimento', value: data?.kpis.em_atendimento  ?? 0, icon: MessageCircle,  color: 'text-emerald-400' },
+    { label: 'Pediram demo',   value: data?.kpis.demo_solicitada ?? 0, icon: PlayCircle,     color: 'text-amber-400'   },
   ]
 
   return (
@@ -113,7 +117,7 @@ export function LeadsRecentes({ refreshKey }: { refreshKey: number }) {
       </div>
 
       {/* KPI cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         {kpis.map(({ label, value, icon: Icon, color }) => (
           <div key={label} className="card p-4">
             <div className="flex items-center gap-2 mb-2">

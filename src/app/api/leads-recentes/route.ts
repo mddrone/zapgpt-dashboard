@@ -2,8 +2,10 @@ import { NextResponse } from 'next/server'
 
 export const revalidate = 0
 
-const SB_URL = process.env.NEXT_PUBLIC_SUPABASE_FINANCEIRO_URL || ''
-const SB_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_FINANCEIRO_KEY || ''
+const SB_URL = process.env.NEXT_PUBLIC_SUPABASE_FINANCEIRO_URL || 'https://zrmlwhxsausektnahand.supabase.co'
+const SB_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
+  || process.env.NEXT_PUBLIC_SUPABASE_FINANCEIRO_KEY
+  || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpybWx3aHhzYXVzZWt0bmFoYW5kIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjgwNDQ5MywiZXhwIjoyMDkyMzgwNDkzfQ.UgsCsPIoxJ6x5OT_MVIXxp8ywCStVMBO2cMYZjXCE3c'
 
 interface SupabaseLead {
   place_id: string
@@ -41,7 +43,7 @@ function graficoDiario(leads: SupabaseLead[]) {
 
 export async function GET() {
   if (!SB_URL || !SB_KEY) {
-    return NextResponse.json({ leads: [], graficoDiario: [], kpis: { hoje: 0, ontem: 0, semana: 0, mes: 0 } })
+    return NextResponse.json({ leads: [], graficoDiario: [], kpis: { hoje: 0, ontem: 0, semana: 0, mes: 0, em_atendimento: 0, demo_solicitada: 0 } })
   }
 
   try {
@@ -76,17 +78,19 @@ export async function GET() {
       leads: recent30.slice(0, 30),
       graficoDiario: graficoDiario(all),
       kpis: {
-        hoje:   all.filter(l => l.data_prospeccao?.startsWith(today)).length,
-        ontem:  all.filter(l => l.data_prospeccao?.startsWith(yesterdayStr)).length,
-        semana: all.filter(l => l.data_prospeccao?.split('T')[0] >= cutoff7Str).length,
-        mes:    all.filter(l => l.data_prospeccao?.startsWith(thisMonth)).length,
+        hoje:            all.filter(l => l.data_prospeccao?.startsWith(today)).length,
+        ontem:           all.filter(l => l.data_prospeccao?.startsWith(yesterdayStr)).length,
+        semana:          all.filter(l => l.data_prospeccao?.split('T')[0] >= cutoff7Str).length,
+        mes:             all.filter(l => l.data_prospeccao?.startsWith(thisMonth)).length,
+        em_atendimento:  all.filter(l => l.status_crm === 'respondeu').length,
+        demo_solicitada: all.filter(l => l.status_crm === 'demo_solicitada').length,
       },
       total: all.length,
     })
   } catch (err) {
     console.error('[leads-recentes] Supabase error:', err)
     return NextResponse.json(
-      { leads: [], graficoDiario: [], kpis: { hoje: 0, ontem: 0, semana: 0, mes: 0 }, total: 0 },
+      { leads: [], graficoDiario: [], kpis: { hoje: 0, ontem: 0, semana: 0, mes: 0, em_atendimento: 0, demo_solicitada: 0 }, total: 0 },
       { status: 200 }
     )
   }

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 
-const N8N_BASE = process.env.NEXT_PUBLIC_N8N_BASE_URL || ''
-const N8N_KEY = process.env.N8N_API_KEY || ''
+const N8N_BASE = process.env.NEXT_PUBLIC_N8N_BASE_URL || 'https://hootingrhinoceros-n8n.cloudfy.live'
+const N8N_KEY = process.env.N8N_API_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMDc2YzgxMS00Y2YwLTQ1NDktYmY2Yy1hYjI2YTEwNmJmYTQiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzc1Nzg5OTExfQ.so50pzhNeQLdZAcWPn4SZfSzCuB6ioln1jXxtX5cnSM'
 const WF01_ID = 'IqLf0HedQWnVgoAy'
 
 export async function GET() {
